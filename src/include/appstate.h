@@ -1,0 +1,87 @@
+#ifndef APPSTATE_H
+#define APPSTATE_H
+
+#include <string>
+#include <vector>
+#include "button.h"
+#include "browser.h"
+#include "statusbar.h"
+#include "notification.h"
+
+struct AvitabDimensions {
+    short x;
+    short y;
+    unsigned short width;
+    unsigned short height;
+    unsigned short textureWidth;
+    unsigned short textureHeight;
+    static constexpr unsigned char bytesPerPixel = 4;
+};
+
+struct AppConfiguration {
+    std::string homepage;
+    bool audio_muted;
+    std::string forced_language;
+    unsigned char framerate;
+    struct StatusBarIcon {
+        std::string icon;
+        std::string url;
+    };
+    std::vector<StatusBarIcon> statusbarIcons;
+};
+
+enum AircraftVariant: unsigned char {
+    VariantUnknown = 0,
+    VariantZibo738
+};
+
+typedef std::function<void()> DelayedTaskFunc;
+
+struct DelayedTask {
+    DelayedTaskFunc func;
+    float executeAfterElapsedSeconds;
+};
+
+class AppState {
+private:
+    AppState();
+    ~AppState();
+    static AppState* instance;
+    bool shouldBrowserVisible;
+    std::vector<DelayedTask> tasks;
+    std::vector<Button *> buttons;
+    Notification *notification;
+    bool loadAvitabConfig();
+    bool fileExists(std::string filename);
+    void determineAircraftVariant(std::string friendlyName);
+    Button *mainMenuButton;
+
+public:
+    AvitabDimensions tabletDimensions;
+    AppConfiguration config;
+    AircraftVariant aircraftVariant = VariantUnknown;
+    bool pluginInitialized = false;
+    bool hasPower = false;
+    bool browserVisible = false;
+    Statusbar *statusbar;
+    Browser *browser;
+    CursorType activeCursor;
+    
+    static AppState* getInstance();
+    bool initialize();
+    void deinitialize();
+    
+    void update();
+    void draw();
+    
+    bool updateButtons(float normalizedX, float normalizedY, ButtonState state);
+    void registerButton(Button *button);
+    void unregisterButton(Button *button);
+    
+    void showBrowser(std::string url = "");
+    void showNotification(Notification *notification);
+    void executeDelayed(DelayedTaskFunc func, float delay);
+    bool loadConfig(bool isReloading = true);
+};
+
+#endif
