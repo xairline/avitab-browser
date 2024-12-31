@@ -57,9 +57,9 @@ Image::Image(std::string filename) {
     free(data);
     
 #if SCALE_IMAGES
-    float aspectRatio = (float)pixelsWidth / pixelsHeight;
     // Images have been designed for 800px width resolution. Scale to size.
-    pixelsWidth = (pixelsWidth * fmin(800.0f, (float)AppState::getInstance()->tabletDimensions.width)) / fmax(800.0f, (float)AppState::getInstance()->tabletDimensions.width);
+    float aspectRatio = (float)pixelsWidth / pixelsHeight;
+    pixelsWidth = (pixelsWidth * (float)AppState::getInstance()->tabletDimensions.width) / 800.0f;
     pixelsHeight = pixelsWidth / aspectRatio;
 #endif
     
