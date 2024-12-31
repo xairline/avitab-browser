@@ -798,7 +798,8 @@
 			buildSettings = {
 				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
 				ARCHS = x86_64;
-				CLANG_ENABLE_OBJC_WEAK = YES;
+				CC = "/opt/homebrew/bin/x86_64-w64-mingw32-g++";
+				CXX = "/opt/homebrew/bin/x86_64-w64-mingw32-g++";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(XPSDK_ROOT)/Libraries/Mac",
 					"$(PROJECT_DIR)/SDK/Libraries/Mac",
@@ -818,23 +819,23 @@
 					"XPLM303=1",
 					"XPLM400=1",
 					"XPLM410=1",
+					"_WIN32=1",
 					"DEBUG=1",
 				);
+				GCC_VERSION = "x86_64-w64-mingw32-g++";
 				HEADER_SEARCH_PATHS = (
 					"$(XPSDK_ROOT)/CHeaders/Widgets",
 					"$(XPSDK_ROOT)/CHeaders/XPLM",
 					"$(HEADER_SEARCH_PATHS)",
+					"/opt/homebrew/opt/mingw-w64/toolchain-x86_64/mingw/include/**",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/lib/cef",
+					"/opt/homebrew/opt/mingw-w64/toolchain-x86_64/mingw/lib/**",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(OTHER_CFLAGS)",
-					"-DNDEBUG",
-				);
 				OTHER_LDFLAGS = (
 					"$(OTHER_LDFLAGS)",
 					"-Wl,-exported_symbol",
@@ -858,7 +859,8 @@
 			buildSettings = {
 				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
 				ARCHS = x86_64;
-				CLANG_ENABLE_OBJC_WEAK = YES;
+				CC = "/opt/homebrew/bin/x86_64-w64-mingw32-g++";
+				CXX = "/opt/homebrew/bin/x86_64-w64-mingw32-g++";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(XPSDK_ROOT)/Libraries/Mac",
 					"$(PROJECT_DIR)/SDK/Libraries/Mac",
@@ -877,22 +879,22 @@
 					"XPLM303=1",
 					"XPLM400=1",
 					"XPLM410=1",
+					"_WIN32=1",
 				);
+				GCC_VERSION = "x86_64-w64-mingw32-g++";
 				HEADER_SEARCH_PATHS = (
 					"$(XPSDK_ROOT)/CHeaders/Widgets",
 					"$(XPSDK_ROOT)/CHeaders/XPLM",
 					"$(HEADER_SEARCH_PATHS)",
+					"/opt/homebrew/opt/mingw-w64/toolchain-x86_64/mingw/include/**",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/lib/cef",
+					"/opt/homebrew/opt/mingw-w64/toolchain-x86_64/mingw/lib/**",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(OTHER_CFLAGS)",
-					"-DNDEBUG",
-				);
 				OTHER_LDFLAGS = (
 					"$(OTHER_LDFLAGS)",
 					"-Wl,-exported_symbol",
