@@ -22,8 +22,8 @@
 
 BrowserHandler::BrowserHandler(int aTextureId, unsigned short aWidth, unsigned short aHeight) {
     textureId = aTextureId;
-    width = aWidth;
-    height = aHeight;
+    windowWidth = aWidth;
+    windowHeight = aHeight;
     cursorState = CursorDefault;
     hasInputFocus = false;
 }
@@ -68,7 +68,7 @@ bool BrowserHandler::OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefF
 }
 
 void BrowserHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) {
-    rect = CefRect(0, 0, width, height);
+    rect = CefRect(0, 0, windowWidth, windowHeight);
 }
 
 void BrowserHandler::OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString &title) {

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 55;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -60,6 +60,7 @@
 		F691E46F2D0338F10000666C /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F691E46E2D0338F10000666C /* OpenGL.framework */; };
 		F691E4722D0339060000666C /* XPLM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F691E4702D0339060000666C /* XPLM.framework */; };
 		F691E4742D0339060000666C /* XPWidgets.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F691E4712D0339060000666C /* XPWidgets.framework */; };
+		F6A0452D2D25E34E00A0FFA3 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F6A0452C2D25E33700A0FFA3 /* libcurl.tbd */; platformFilters = (maccatalyst, macos, ); };
 		F6AF9EC02D06F84900530297 /* path.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6AF9EBE2D06F84900530297 /* path.cpp */; };
 		F6AF9EC12D06F84900530297 /* dataref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6AF9EBC2D06F84900530297 /* dataref.cpp */; };
 		F6AF9EC62D078DB000530297 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6AF9EC52D078DB000530297 /* Cocoa.framework */; };
@@ -137,6 +138,7 @@
 		F691E46E2D0338F10000666C /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		F691E4702D0339060000666C /* XPLM.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XPLM.framework; path = SDK/Libraries/Mac/XPLM.framework; sourceTree = "<group>"; };
 		F691E4712D0339060000666C /* XPWidgets.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XPWidgets.framework; path = SDK/Libraries/Mac/XPWidgets.framework; sourceTree = "<group>"; };
+		F6A0452C2D25E33700A0FFA3 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = usr/lib/libcurl.tbd; sourceTree = SDKROOT; };
 		F6AF9EBB2D06F84900530297 /* dataref.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dataref.h; sourceTree = "<group>"; };
 		F6AF9EBC2D06F84900530297 /* dataref.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dataref.cpp; sourceTree = "<group>"; };
 		F6AF9EBD2D06F84900530297 /* path.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = path.h; sourceTree = "<group>"; };
@@ -155,6 +157,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F6A0452D2D25E34E00A0FFA3 /* libcurl.tbd in Frameworks */,
 				F691E46D2D0338E90000666C /* CoreFoundation.framework in Frameworks */,
 				F691E46F2D0338F10000666C /* OpenGL.framework in Frameworks */,
 				F6602C152D0CC67C00204B65 /* libcef_dll_wrapper.a in Frameworks */,
@@ -310,6 +313,7 @@
 		F691E46B2D0338E90000666C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F6A0452C2D25E33700A0FFA3 /* libcurl.tbd */,
 				F6602C132D0CBECE00204B65 /* libcef_dll_wrapper.a */,
 				F63C5D042D0B80B800E7D0DA /* Chromium Embedded Framework.framework */,
 				F6AF9EC52D078DB000530297 /* Cocoa.framework */,

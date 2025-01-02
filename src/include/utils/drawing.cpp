@@ -87,42 +87,59 @@ void Drawing::DrawRoundedRect(float x1, float y1, float x2, float y2, float radi
 }
 
 std::vector<std::string> Drawing::SplitTextToWords(const std::string & text) {
-    auto is_wrap_char = [](char c) -> bool { return c == ' '; };
-    size_t word_count = 1 + std::count_if(text.cbegin(), text.cend(), is_wrap_char);
+    auto isWrapChar = [](char c) -> bool { return c == ' ' || c == '\n'; };
+    size_t wordCount = 1 + std::count_if(text.cbegin(), text.cend(), isWrapChar);
 
     std::vector<std::string> ret;
-    ret.reserve(word_count);
+    ret.reserve(wordCount);
 
-    size_t current_position = 0;
+    size_t currentPosition = 0;
     while(true) {
-        size_t split_position = text.find_first_of(' ', current_position);
-        if(split_position == std::string::npos) {
-            ret.push_back(text.substr(current_position));
+        size_t splitPosition = text.find_first_of(" \n", currentPosition);
+        if(splitPosition == std::string::npos) {
+            ret.push_back(text.substr(currentPosition));
             break;
         }
-        ret.push_back(text.substr(current_position, split_position - current_position));
-        current_position = split_position + 1;
+        
+        std::string word = text.substr(currentPosition, splitPosition - currentPosition);
+        if (!word.empty()) {
+            ret.push_back(word);
+        }
+        if (text[splitPosition] == '\n') {
+            ret.push_back("\n");
+        }
+        currentPosition = splitPosition + 1;
     }
 
     return ret;
 }
 
-std::vector<std::string> Drawing::WrapWordsToLines(XPLMFontID font, const std::string & text, float normalizedWidth) {
+std::vector<std::string> Drawing::WrapWordsToLines(XPLMFontID font, const std::string &text, float normalizedWidth) {
     std::vector<std::string> words = SplitTextToWords(text);
     float spaceWidth = XPLMMeasureString(font, " ", 1);
     float spaceLeft = 0;
     std::vector<std::string> lines;
     for(const std::string & word : words) {
+        if (word == "\n") {
+            if (spaceLeft == 0) {
+                lines.push_back("");
+            }
+            else {
+                spaceLeft = 0;
+            }
+            continue;
+        }
+        
         float wordWidth = XPLMMeasureString(font, word.c_str(), (int)word.size());
 
-        if(wordWidth + spaceWidth <= spaceLeft) {
+        if (wordWidth + spaceWidth <= spaceLeft) {
             lines.back() += " ";
             lines.back() += word;
 
             spaceLeft -= wordWidth + spaceWidth;
         } else {
             lines.push_back(word);
-            float widthPixels = AppState::getInstance()->tabletDimensions.x + AppState::getInstance()->tabletDimensions.width * normalizedWidth;
+            float widthPixels = AppState::getInstance()->tabletDimensions.width * normalizedWidth;
             spaceLeft = widthPixels - wordWidth;
         }
     }

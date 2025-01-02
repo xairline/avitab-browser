@@ -12,7 +12,9 @@
 #define debug(format, ...) { char buffer[1024]; snprintf(buffer, sizeof(buffer), "[avitab-browser] " format, ##__VA_ARGS__); XPLMDebugString(buffer); }
 
 #define PRODUCT_NAME "avitab-browser"
-#define FRIENDLY_NAME "Avitab Browser"
+#define FRIENDLY_NAME "AviTab Browser"
+#define VERSION 3
+#define VERSION_CHECK_URL "https://api.github.com/repos/rswilem/avitab-browser/releases?per_page=1&page=1"
 #define ALL_PLUGINS_DIRECTORY "/Resources/plugins/"
 #define PLUGIN_DIRECTORY ALL_PLUGINS_DIRECTORY PRODUCT_NAME
 #define BUNDLE_ID "com.ramonster." PRODUCT_NAME

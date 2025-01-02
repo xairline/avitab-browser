@@ -25,6 +25,7 @@
 #include "dataref.h"
 #include "browser_handler.h"
 #include "keycodes.h"
+#include "drawing.h"
 
 Browser::Browser() {
 }
@@ -35,9 +36,8 @@ void Browser::initialize() {
     }
 
     if (AppState::getInstance()->aircraftVariant == VariantZibo738) {
-        width = AppState::getInstance()->tabletDimensions.width;
-        height = ceil(AppState::getInstance()->tabletDimensions.height * 0.947f);
-        yOffset = ceil(AppState::getInstance()->tabletDimensions.height * 0.03f);
+        offsetStart = 0.022f;
+        offsetEnd = 0.977f;
         
         backButton = new Button(0.27f, 0.09f);
         backButton->setPosition(0.15f, -0.019f);
@@ -55,9 +55,8 @@ void Browser::initialize() {
         });
     }
     else {
-        width = AppState::getInstance()->tabletDimensions.width;
-        height = ceil(AppState::getInstance()->tabletDimensions.height * 0.935f);
-        yOffset = 0;
+        offsetStart = 0;
+        offsetEnd = 0.935f;
         
         backButton = new Button(Path::getInstance()->pluginDirectory + "/assets/icons/arrow-left-circle.svg");
         backButton->setPosition(backButton->relativeWidth / 2.0f + 0.01f, 0.967f);
@@ -171,16 +170,18 @@ void Browser::draw() {
     
     XPLMBindTexture2d(textureId, 0);
     
-    int x1 = AppState::getInstance()->tabletDimensions.x;
-    int y1 = AppState::getInstance()->tabletDimensions.y + yOffset;
-    int x2 = x1 + width;
-    int y2 = y1 + height;
+    const auto& tabletDimensions = AppState::getInstance()->tabletDimensions;
+    int x1 = tabletDimensions.x;
+    int y1 = tabletDimensions.y + tabletDimensions.height * offsetStart;
+    int x2 = x1 + tabletDimensions.width;
+    int y2 = y1 + tabletDimensions.height * (offsetEnd - offsetStart);
     
     glBegin(GL_QUADS);
     glColor3f(1, 1, 1);
     
-    float u = (float)width / AppState::getInstance()->tabletDimensions.textureWidth;
-    float v = (float)height / AppState::getInstance()->tabletDimensions.textureHeight;
+    float u = (float)tabletDimensions.browserWidth / tabletDimensions.textureWidth;
+    float v = (float)tabletDimensions.browserHeight / tabletDimensions.textureHeight;
+    
     glTexCoord2f(0, v);
     glVertex2f(x1,y1);
     glTexCoord2f(0, 0);
@@ -201,10 +202,7 @@ void Browser::mouseMove(float normalizedX, float normalizedY) {
         return;
     }
     
-    CefMouseEvent mouseEvent;
-    mouseEvent.x = AppState::getInstance()->tabletDimensions.width * normalizedX;
-    mouseEvent.y = AppState::getInstance()->tabletDimensions.height * normalizedY - (AppState::getInstance()->tabletDimensions.height - height - yOffset);
-    
+    CefMouseEvent mouseEvent = getMouseEvent(normalizedX, normalizedY);
     handler->browserInstance->GetHost()->SendMouseMoveEvent(mouseEvent, false);
 }
 
@@ -213,9 +211,7 @@ bool Browser::click(XPLMMouseStatus status, float normalizedX, float normalizedY
         return false;
     }
     
-    CefMouseEvent mouseEvent;
-    mouseEvent.x = AppState::getInstance()->tabletDimensions.width * normalizedX;
-    mouseEvent.y = AppState::getInstance()->tabletDimensions.height * normalizedY - (AppState::getInstance()->tabletDimensions.height - height - yOffset);
+    CefMouseEvent mouseEvent = getMouseEvent(normalizedX, normalizedY);
     if (mouseEvent.y < 0) {
         return false;
     }
@@ -239,11 +235,17 @@ void Browser::scroll(float normalizedX, float normalizedY, int clicks, bool hori
         return;
     }
     
-    CefMouseEvent mouseEvent;
-    mouseEvent.x = AppState::getInstance()->tabletDimensions.width * normalizedX;
-    mouseEvent.y = AppState::getInstance()->tabletDimensions.height * normalizedY - (AppState::getInstance()->tabletDimensions.height - height - yOffset);
+    CefMouseEvent mouseEvent = getMouseEvent(normalizedX, normalizedY);
     mouseEvent.modifiers = EVENTFLAG_NONE;
     handler->browserInstance->GetHost()->SendMouseWheelEvent(mouseEvent, horizontal ? clicks : 0, horizontal ? 0 : clicks);
+}
+
+std::string Browser::currentUrl() {
+    if (!textureId || !handler) {
+        return "";
+    }
+    
+    return handler->browserInstance->GetMainFrame()->GetURL().ToString();
 }
 
 void Browser::loadUrl(std::string url) {
@@ -367,6 +369,8 @@ bool Browser::createBrowser() {
     }
     
     debug("Loading CEF library: %s\n", CEF_VERSION);
+    debug("Chrome version preproc: %i-%i-%i\n", CEF_VERSION_MAJOR, CEF_VERSION_MINOR, CEF_VERSION_PATCH);
+    debug("Chrome version runtime: %i-%i-%i\n", cef_version_info(0), cef_version_info(1), cef_version_info(2));
     
     CefRequestContextSettings context_settings;
     CefString(&context_settings.cache_path) = Path::getInstance()->pluginDirectory + "/cache";
@@ -442,8 +446,7 @@ bool Browser::createBrowser() {
 //        debug("CefInitialize failed.\n");
 //        return false;
 //    }
-    
-    handler = CefRefPtr<BrowserHandler>(new BrowserHandler(textureId, width, height));
+    handler = CefRefPtr<BrowserHandler>(new BrowserHandler(textureId, AppState::getInstance()->tabletDimensions.browserWidth, AppState::getInstance()->tabletDimensions.browserHeight));
     
     CefWindowInfo window_info;
     window_info.SetAsWindowless(nullptr);
@@ -480,4 +483,13 @@ void Browser::updateGPSLocation() {
     
     handler->browserInstance->GetMainFrame()->ExecuteJavaScript(stream.str(), "about:blank", 0);
     lastGpsUpdateTime = XPLMGetElapsedTime();
+}
+
+CefMouseEvent Browser::getMouseEvent(float normalizedX, float normalizedY) {
+    const auto& tabletDimensions = AppState::getInstance()->tabletDimensions;
+
+    CefMouseEvent mouseEvent;
+    mouseEvent.x = tabletDimensions.browserWidth * normalizedX;
+    mouseEvent.y = tabletDimensions.browserHeight * (1.0f - ((normalizedY - offsetStart) / (offsetEnd - offsetStart)));
+    return mouseEvent;
 }

@@ -205,7 +205,7 @@ int mouseClicked(XPLMWindowID inWindowID, int x, int y, XPLMMouseStatus status, 
         return 0;
     }
     
-    if (AppState::getInstance()->browser->click(status, mouseX, 1.0f - mouseY)) {
+    if (AppState::getInstance()->browser->click(status, mouseX, mouseY)) {
         return 1;
     }
     
@@ -223,7 +223,7 @@ int mouseWheel(XPLMWindowID inWindowID, int x, int y, int wheel, int clicks, voi
     }
     
     bool horizontal = wheel == 1;
-    AppState::getInstance()->browser->scroll(mouseX, 1.0f - mouseY, clicks * 3, horizontal);
+    AppState::getInstance()->browser->scroll(mouseX, mouseY, clicks * 3, horizontal);
     return 1;
 }
 
@@ -305,7 +305,7 @@ float update(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoo
     
     float mouseX, mouseY;
     if (Dataref::getInstance()->getMouse(&mouseX, &mouseY)) {
-        AppState::getInstance()->browser->mouseMove(mouseX, 1.0f - mouseY);
+        AppState::getInstance()->browser->mouseMove(mouseX, mouseY);
     }
     
     return REFRESH_INTERVAL_SECONDS_FAST;

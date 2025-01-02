@@ -8,6 +8,11 @@
 #include "dataref.h"
 #include "json.hpp"
 
+#include <iostream>
+#include <regex>
+#include "json.hpp"
+#include <curl/curl.h>
+
 AppState* AppState::instance = nullptr;
 
 AppState::AppState() {
@@ -62,7 +67,7 @@ bool AppState::initialize() {
     
     if (aircraftVariant == VariantZibo738) {
         mainMenuButton = new Button(Path::getInstance()->pluginDirectory + "/assets/menu-item-zibo.png");
-        mainMenuButton->setPosition(0.604f, 0.404f);
+        mainMenuButton->setPosition(0.604f, 0.4f);
     }
     else {
         mainMenuButton = new Button(Path::getInstance()->pluginDirectory + "/assets/menu-item.png");
@@ -92,6 +97,40 @@ void AppState::deinitialize() {
     statusbar = nullptr;
     pluginInitialized = false;
     instance = nullptr;
+}
+
+void AppState::checkLatestVersion() {
+    if (latestVersionNumber > 0) {
+        // Version information was already fetched. Only check once per session.
+        return;
+    }
+    
+    std::string response;
+    CURL* curl = curl_easy_init();
+    curl_easy_setopt(curl, CURLOPT_URL, VERSION_CHECK_URL);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, +[](void* contents, size_t size, size_t nmemb, std::string* userp) {
+        userp->append((char*)contents, size * nmemb);
+        return size * nmemb;
+    });
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "Mozilla/5.0");
+    curl_easy_perform(curl);
+    curl_easy_cleanup(curl);
+
+    try {
+        std::string tag = nlohmann::json::parse(response)[0]["tag_name"];
+        std::string cleaned = std::regex_replace(tag, std::regex("[^0-9]"), "");
+        latestVersionNumber = std::stoi(cleaned);
+        if (latestVersionNumber > VERSION) {
+            debug("There is a newer version of the plugin available. Current: %i, latest: %i\n", VERSION, latestVersionNumber);
+            std::string description = "There is an update available for the " + std::string(FRIENDLY_NAME) + " plugin.\n\nVersion " + tag + ".\n";
+            showNotification(new Notification("Update available", description));
+        }
+    } catch (const std::exception& e) {
+        debug("Could not fetch latest version information from GitHub.\n");
+        // Assume we're on the latest version to prevent refetching
+        latestVersionNumber = VERSION;
+    }
 }
 
 void AppState::update() {
@@ -126,6 +165,7 @@ void AppState::update() {
         browser->visibilityWillChange(true);
         browserVisible = true;
         shouldBrowserVisible = false;
+        checkLatestVersion();
     }
 
     if (notification) {
@@ -219,20 +259,23 @@ bool AppState::loadConfig(bool isReloading) {
         return false;
     }
     
-    if (!loadAvitabConfig()) {
-        debug("Could not find AviTab.json config file in aircraft directory, or JSON file is malformed. Not loading the plugin for this aircraft.\n");
-        return false;
-    }
-    
     std::string filename = Path::getInstance()->pluginDirectory + "/config.ini";
     if (isReloading) {
         debug("Reloading configuration at %s...\n", filename.c_str());
     }
     
     if (!fileExists(filename)) {
-        const char *defaultConfig = R"([browser]
+        const char *defaultConfig = R"(# AviTab browser configuration file.
+# If you're having trouble with this file or missing parameters, delete it and restart X-Plane.
+# This file will then be recreated with default settings.
+[browser]
 homepage=https://www.google.com
 audio_muted=false
+# minimum_width: Ensures the browser width does not go below this value.
+# This is useful for planes with small AviTab resolutions.
+# The height is adjusted proportionally to maintain the aspect ratio.
+# Note: Setting a minimum width scales the browser, which may reduce quality. 
+minimum_width=
 # forced_language: The language code for the application.
 # Valid values: en-US, en-GB, nl-NL, fr-FR, etc.
 # Leave empty for default language.
@@ -277,6 +320,7 @@ url_5=
     
     config.homepage = reader.Get("browser", "homepage", "https://www.google.com");
     config.audio_muted = reader.GetBoolean("browser", "audio_muted", false);
+    config.minimum_width = reader.GetInteger("browser", "minimum_width", 0);
     config.forced_language = reader.Get("browser", "forced_language", "");
     config.framerate = reader.GetInteger("browser", "framerate", 25);
     config.statusbarIcons.clear();
@@ -289,10 +333,24 @@ url_5=
         }
     }
     
+    if (!loadAvitabConfig()) {
+        debug("Could not find AviTab.json config file in aircraft directory, or JSON file is malformed. Not loading the plugin for this aircraft.\n");
+        return false;
+    }
+    
     if (isReloading) {
         debug("Config file has been reloaded.\n");
         statusbar->destroy();
         statusbar->initialize();
+        
+        std::string url = browser->currentUrl();
+        browser->visibilityWillChange(false);
+        browserVisible = false;
+        browser->destroy();
+        browser->initialize();
+        browser->loadUrl(url);
+        browser->visibilityWillChange(true);
+        browserVisible = true;
     }
     
     return true;
@@ -326,6 +384,7 @@ bool AppState::loadAvitabConfig() {
         data["panel"]["bottom"],
         data["panel"]["width"],
         data["panel"]["height"],
+        0,0,
         0,0
     };
     
@@ -335,10 +394,16 @@ bool AppState::loadAvitabConfig() {
     tabletDimensions.height = aspectHeight;
 #endif
     
-    tabletDimensions.textureWidth = pow(2, ceil(log2(tabletDimensions.width)));
-    tabletDimensions.textureHeight = pow(2, ceil(log2(tabletDimensions.height)));
+    float multiplier = tabletDimensions.width < config.minimum_width ? (float)config.minimum_width / tabletDimensions.width : 1;
+    tabletDimensions.textureWidth = pow(2, ceil(log2(tabletDimensions.width * multiplier)));
+    tabletDimensions.textureHeight = pow(2, ceil(log2(tabletDimensions.height * multiplier)));
+    tabletDimensions.browserWidth = ceil(tabletDimensions.width * multiplier);
+    tabletDimensions.browserHeight = ceil(tabletDimensions.height * multiplier);
     
     debug("Found AviTab.json config (%ipx x %ipx)\n", tabletDimensions.width, tabletDimensions.height);
+    if (tabletDimensions.browserWidth > tabletDimensions.width) {
+        debug("AviTab.json resolution was smaller than %ipx, using upscaled browser. (%ipx x %ipx)\n", config.minimum_width, tabletDimensions.browserWidth, tabletDimensions.browserHeight);
+    }
     
     return true;
 }

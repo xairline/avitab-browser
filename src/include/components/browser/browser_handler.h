@@ -14,8 +14,8 @@ class BrowserHandler : public CefClient, public CefPermissionHandler, public Cef
 private:
     IMPLEMENT_REFCOUNTING(BrowserHandler);
     int textureId;
-    unsigned short width;
-    unsigned short height;
+    unsigned short windowWidth;
+    unsigned short windowHeight;
     
 public:
     BrowserHandler(int textureId, unsigned short width, unsigned short height);

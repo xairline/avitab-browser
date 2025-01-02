@@ -15,12 +15,15 @@ struct AvitabDimensions {
     unsigned short height;
     unsigned short textureWidth;
     unsigned short textureHeight;
+    unsigned short browserWidth;
+    unsigned short browserHeight;
     static constexpr unsigned char bytesPerPixel = 4;
 };
 
 struct AppConfiguration {
     std::string homepage;
     bool audio_muted;
+    unsigned short minimum_width;
     std::string forced_language;
     unsigned char framerate;
     struct StatusBarIcon {
@@ -47,6 +50,7 @@ private:
     AppState();
     ~AppState();
     static AppState* instance;
+    int latestVersionNumber;
     bool shouldBrowserVisible;
     std::vector<DelayedTask> tasks;
     std::vector<Button *> buttons;
@@ -70,6 +74,7 @@ public:
     static AppState* getInstance();
     bool initialize();
     void deinitialize();
+    void checkLatestVersion();
     
     void update();
     void draw();
