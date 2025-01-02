@@ -2,6 +2,7 @@ SDK/
 lib/mac_x64/
 lib/lin_x64/
 lib/win_x64/
+build/
 
 CMakeLists.txt.user
 CMakeCache.txt

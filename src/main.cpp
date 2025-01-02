@@ -298,6 +298,13 @@ int mouseCursor(XPLMWindowID inWindowID, int x, int y, void* inRefcon) {
                 break;
 #elif LIN
 #elif IBM
+            case CursorHand:
+                SetCursor(LoadCursor(NULL, IDC_HAND));
+                break;
+                
+            case CursorText:
+                SetCursor(LoadCursor(NULL, IDC_IBEAM));
+                break;
 #endif
             default:
                 break;
