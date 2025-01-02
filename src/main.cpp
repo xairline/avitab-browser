@@ -12,6 +12,7 @@
 #include <XPLMProcessing.h>
 #include <XPLMMenus.h>
 #include <cmath>
+#include "drawing.h"
 
 #if APL
 #include "cursor.h"
@@ -130,18 +131,49 @@ void menuAction(void* mRef, void* iRef) {
         int winLeft, winTop, winRight, winBot;
         XPLMGetScreenBoundsGlobal(&winLeft, &winTop, &winRight, &winBot);
         XPLMCreateWindow_t params;
-        float width = fabs(winLeft - winRight);
-        float height = fabs(winTop - winBot);
+        float screenWidth = fabs(winLeft - winRight);
+        float screenHeight = fabs(winTop - winBot);
+        float width = 400.0f;
+        float height = 180.0f;
 
         // Calculate centered position for the window
         params.structSize = sizeof(params);
-        params.left = (int)(winLeft + (width - 100) / 2);
-        params.right = params.left + 100;
-        params.top = (int)(winTop - (height - 100) / 2);
-        params.bottom = params.top - 100;
+        params.left = (int)(winLeft + (screenWidth - width) / 2);
+        params.right = params.left + width;
+        params.top = (int)(winTop - (screenHeight - height) / 2);
+        params.bottom = params.top - height;
         params.visible = 1;
         params.refcon = nullptr;
-        params.drawWindowFunc = [](XPLMWindowID, void *){};
+        params.drawWindowFunc = [](XPLMWindowID inWindowID, void *drawingRef){
+            XPLMSetGraphicsState(
+                                 0, // No fog, equivalent to glDisable(GL_FOG);
+                                 0, // One texture, equivalent to glEnable(GL_TEXTURE_2D);
+                                 0, // No lighting, equivalent to glDisable(GL_LIGHT0);
+                                 0, // No alpha testing, e.g glDisable(GL_ALPHA_TEST);
+                                 1, // Use alpha blending, e.g. glEnable(GL_BLEND);
+                                 0, // No depth read, e.g. glDisable(GL_DEPTH_TEST);
+                                 0 // No depth write, e.g. glDepthMask(GL_FALSE);
+            );
+            glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+            
+            int left, top, right, bottom;
+            XPLMGetWindowGeometry(inWindowID, &left, &top, &right, &bottom);
+            float color[] = {1.0f, 1.0f, 1.0f};
+            
+            float x = left + 16.0f;
+            float y = top - 16.0f;
+            XPLMDrawString(color, x, y, FRIENDLY_NAME, nullptr, xplmFont_Proportional);
+            y -= 16.0f;
+            XPLMDrawString(color, x, y, ("Version " + std::to_string(VERSION)).c_str(), nullptr, xplmFont_Proportional);
+            y -= 32.0f;
+            XPLMDrawString(color, x, y, "This software is licensed under the GNU General Public License, GPL-3.0", nullptr, xplmFont_Proportional);
+            y -= 32.0f;
+            XPLMDrawString(color, x, y, "For updates to " FRIENDLY_NAME ", please see the forums at x-plane.org", nullptr, xplmFont_Proportional);
+            y -= 16.0f;
+            XPLMDrawString(color, x, y, "or checkout the GitHub releases at github.com/rswilem/avitab-browser.", nullptr, xplmFont_Proportional);
+            y -= 16.0f;
+            XPLMDrawString(color, x, y, "Made with love by TheRamon, thank you for using this software!", nullptr, xplmFont_Proportional);
+        };
         params.handleMouseClickFunc = nullptr;
         params.handleRightClickFunc = nullptr;
         params.handleMouseWheelFunc = nullptr;
@@ -150,7 +182,7 @@ void menuAction(void* mRef, void* iRef) {
         params.layer = xplm_WindowLayerFloatingWindows;
         params.decorateAsFloatingWindow = xplm_WindowDecorationRoundRectangle;
         XPLMWindowID aboutWindow = XPLMCreateWindowEx(&params);
-        XPLMSetWindowTitle(aboutWindow, "About us");
+        XPLMSetWindowTitle(aboutWindow, FRIENDLY_NAME);
         XPLMSetWindowPositioningMode(aboutWindow, xplm_WindowPositionFree, -1);
         XPLMBringWindowToFront(aboutWindow);
     }
