@@ -37,10 +37,10 @@ void Path::reloadPaths() {
     char filename[256];
     char modelPath[512];
     XPLMGetNthAircraftModel(XPLM_USER_AIRCRAFT, filename, modelPath);
-    string aircraftExecutable = modelPath;
+    std::string aircraftExecutable = modelPath;
     if (!aircraftExecutable.empty()) {
         size_t filenamePos = aircraftExecutable.find(filename);
-        if (filenamePos != string::npos) {
+        if (filenamePos != std::string::npos) {
             aircraftDirectory = aircraftExecutable.substr(0, filenamePos);
         }
         else {

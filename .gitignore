@@ -1,5 +1,7 @@
 SDK/
-lib/cef/
+lib/mac_x64/
+lib/lin_x64/
+lib/win_x64/
 
 CMakeLists.txt.user
 CMakeCache.txt

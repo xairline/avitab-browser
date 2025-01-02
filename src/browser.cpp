@@ -3,7 +3,6 @@
 #include <sstream>
 #include <include/cef_base.h>
 #include <include/base/cef_callback.h>
-#include <include/wrapper/cef_library_loader.h>
 #include <include/cef_version.h>
 #include <include/cef_base.h>
 #include <include/cef_app.h>
@@ -26,6 +25,10 @@
 #include "browser_handler.h"
 #include "keycodes.h"
 #include "drawing.h"
+
+#if APL
+#include <include/wrapper/cef_library_loader.h>
+#endif
 
 Browser::Browser() {
 }
@@ -362,11 +365,13 @@ bool Browser::createBrowser() {
         return false;
     }
     
+#if APL
     CefScopedLibraryLoader library_loader;
     if (!library_loader.LoadInMain()) {
         debug("Could not load CEF library!\n");
         return false;
     }
+#endif
     
     debug("Loading CEF library: %s\n", CEF_VERSION);
     debug("Chrome version preproc: %i-%i-%i\n", CEF_VERSION_MAJOR, CEF_VERSION_MINOR, CEF_VERSION_PATCH);

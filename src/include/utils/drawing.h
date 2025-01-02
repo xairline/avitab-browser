@@ -2,6 +2,7 @@
 #define DRAWING_H
 
 #include <XPLMGraphics.h>
+#include <vector>
 #include <string>
 #include <array>
 

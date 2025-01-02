@@ -1,8 +1,8 @@
 #include "drawing.h"
 #include "config.h"
 #include "appstate.h"
-#include <vector>
 #include <algorithm>
+#include <cmath>
 
 float Drawing::AbsoluteX(float normalizedX) {
     return AppState::getInstance()->tabletDimensions.x + AppState::getInstance()->tabletDimensions.width * normalizedX;

@@ -13,6 +13,7 @@
 #include <include/wrapper/cef_helpers.h>
 #include <sstream>
 #include <string>
+#include <cmath>
 #include <XPLMProcessing.h>
 #include <XPLMUtilities.h>
 #include <XPLMGraphics.h>
@@ -59,7 +60,7 @@ void BrowserHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
 }
 
 
-bool BrowserHandler::OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString &target_url, const CefString &target_frame_name, WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures &popupFeatures, CefWindowInfo &windowInfo, CefRefPtr<CefClient> &client, CefBrowserSettings &settings, CefRefPtr<CefDictionaryValue> &extra_info, bool *no_javascript_access) {
+bool BrowserHandler::OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString &target_url, const CefString &target_frame_name, CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures &popupFeatures, CefWindowInfo &windowInfo, CefRefPtr<CefClient> &client, CefBrowserSettings &settings, CefRefPtr<CefDictionaryValue> &extra_info, bool *no_javascript_access) {
     if (user_gesture && !target_url.empty()) {
         browser->GetMainFrame()->LoadURL(target_url);
     }
@@ -100,7 +101,7 @@ void BrowserHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType typ
     }
 }
 
-bool BrowserHandler::OnCursorChange(CefRefPtr<CefBrowser> browser, void *cursor, cef_cursor_type_t type, const CefCursorInfo &custom_cursor_info) {
+bool BrowserHandler::OnCursorChange(CefRefPtr<CefBrowser> browser, CefCursorHandle cursor, cef_cursor_type_t type, const CefCursorInfo &custom_cursor_info) {
     switch (type) {
         case CT_HAND:
             cursorState = CursorHand;
@@ -218,7 +219,7 @@ void BrowserHandler::OnDownloadUpdated(CefRefPtr<CefBrowser> browser, CefRefPtr<
         AppState::getInstance()->showNotification(new Notification("Download finished", "The download has been completed."));
     }
     else {
-        int percentComplete = max(0, static_cast<int>(download_item->GetPercentComplete()));
+        int percentComplete = fmax(0, static_cast<int>(download_item->GetPercentComplete()));
         AppState::getInstance()->statusbar->setNotice("Downloading... " + std::to_string(percentComplete) + "%");
     }
 }

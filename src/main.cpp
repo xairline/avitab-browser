@@ -11,6 +11,7 @@
 #include <XPLMMenus.h>
 #include <XPLMProcessing.h>
 #include <XPLMMenus.h>
+#include <cmath>
 
 #if APL
 #include "cursor.h"
@@ -267,6 +268,7 @@ int mouseCursor(XPLMWindowID inWindowID, int x, int y, void* inRefcon) {
 #elif IBM
 #endif
             default:
+                break;
         }
     }
     

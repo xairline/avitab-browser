@@ -2,7 +2,6 @@
 #define PATH_H
 
 #include <string>
-using namespace std;
 
 class Path {
 private:
@@ -11,10 +10,10 @@ private:
     static Path* instance;
 
 public:
-    string rootDirectory;
-    string pluginDirectory;
-    string aircraftDirectory;
-    string aircraftFilename;
+    std::string rootDirectory;
+    std::string pluginDirectory;
+    std::string aircraftDirectory;
+    std::string aircraftFilename;
     
     static Path* getInstance();
     void reloadPaths();

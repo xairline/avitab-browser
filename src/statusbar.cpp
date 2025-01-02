@@ -3,6 +3,7 @@
 #include "drawing.h"
 #include "path.h"
 #include "appstate.h"
+#include <cmath>
 #include <XPLMUtilities.h>
 #include <XPLMGraphics.h>
 #include <XPLMProcessing.h>
