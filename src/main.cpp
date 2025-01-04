@@ -1,5 +1,5 @@
-#ifndef XPLM410
-    #error This is made to be compiled against the XPLM410 SDK
+#ifndef XPLM301
+    #error This is made to be compiled against the XPLM301 for XP11 and XPLM410 SDK for XP12
 #endif
 
 #include "config.h"
@@ -20,10 +20,37 @@
 
 #if IBM
 #include <windows.h>
-BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call)
     {
-        case DLL_PROCESS_ATTACH:
+        case DLL_PROCESS_ATTACH: {
+//             TODO: See if we're able to redirect the search path for libcef.dll to X-Planes default location. See comments below.
+//             debug("DLL_PROCESS_ATTACH\n");
+//             wchar_t dllPath[MAX_PATH];
+//             GetModuleFileNameW(hModule, dllPath, MAX_PATH);
+//             debug("DLL path: %ls\n", dllPath);
+//             wchar_t* lastSlash = wcsrchr(dllPath, L'\\');
+//             if (lastSlash) {
+//                 *lastSlash = L'\0';
+//             }
+//
+//             debug("DLL directory: %ls\n", dllPath);
+//            
+//             // Set the DLL search directory
+//             // xp11: Resources/dlls/64/cef/win/bin/release/cefSimpleHelper.exe
+//             // xp11: Resources/dlls/64/cef/win/resources/locales/
+//            
+//             // xp12: Resources/dlls/64/cef/win
+//             // xp12: Resources/dlls/64/cef/win/cefclient.exe
+//             // xp12: Resources/dlls/64/cef/win/icudtl
+//             // xp12: Resources/dlls/64/cef/win/libcef.dll
+//             std::wstring dependencyPath = std::wstring(dllPath) + L"\\..\\..\\..\\dlls\\64\\cef\\win\\bin\\release";
+//             //std::wstring dependencyPath = std::wstring(dllPath) + L"\\dlls\\64\\cef\\win\\bin\\release";
+//             debug("Setting DLL directory to: %ls\n", dependencyPath.c_str());
+//             SetDllDirectoryW(dependencyPath.c_str());
+//             break;
+        }
+            
         case DLL_THREAD_ATTACH:
         case DLL_THREAD_DETACH:
         case DLL_PROCESS_DETACH:
@@ -44,12 +71,6 @@ unsigned short pressedKeyCode = 0;
 double pressedKeyTime = 0;
 XPLMWindowID window;
 
-#if DEBUG
-void criticalErrorOccured(const char *inMessage) {
-    debug("X-Plane reported an error with our plugin: %s\n", inMessage);
-}
-#endif
-
 PLUGIN_API int XPluginStart(char * name, char * sig, char * desc)
 {
     strcpy(name, FRIENDLY_NAME);
@@ -68,11 +89,7 @@ PLUGIN_API int XPluginStart(char * name, char * sig, char * desc)
     
     XPluginReceiveMessage(0, XPLM_MSG_PLANE_LOADED, nullptr);
     
-#if DEBUG
-    XPLMSetErrorCallback(criticalErrorOccured);
-#endif
-    
-    debug("Plugin started.\n");
+    debug("Plugin started (v%s)\n", VERSION);
     return 1;
 }
 
@@ -83,7 +100,7 @@ PLUGIN_API void XPluginStop(void) {
     window = nullptr;
     
     AppState::getInstance()->deinitialize();
-    debug("Plugin stopped.\n");
+    debug("Plugin stopped\n");
 }
 
 PLUGIN_API int XPluginEnable(void) {
@@ -133,7 +150,7 @@ void menuAction(void* mRef, void* iRef) {
         XPLMCreateWindow_t params;
         float screenWidth = fabs(winLeft - winRight);
         float screenHeight = fabs(winTop - winBot);
-        float width = 400.0f;
+        float width = 450.0f;
         float height = 180.0f;
 
         // Calculate centered position for the window
@@ -164,7 +181,7 @@ void menuAction(void* mRef, void* iRef) {
             float y = top - 16.0f;
             XPLMDrawString(color, x, y, FRIENDLY_NAME, nullptr, xplmFont_Proportional);
             y -= 16.0f;
-            XPLMDrawString(color, x, y, ("Version " + std::to_string(VERSION)).c_str(), nullptr, xplmFont_Proportional);
+            XPLMDrawString(color, x, y, "Version " VERSION, nullptr, xplmFont_Proportional);
             y -= 32.0f;
             XPLMDrawString(color, x, y, "This software is licensed under the GNU General Public License, GPL-3.0", nullptr, xplmFont_Proportional);
             y -= 32.0f;
@@ -238,9 +255,9 @@ int mouseClicked(XPLMWindowID inWindowID, int x, int y, XPLMMouseStatus status, 
         return 0;
     }
     
-    if (AppState::getInstance()->browser->click(status, mouseX, mouseY)) {
-        return 1;
-    }
+     if (AppState::getInstance()->browser->click(status, mouseX, mouseY)) {
+         return 1;
+     }
     
     return 0;
 }
@@ -315,39 +332,39 @@ int mouseCursor(XPLMWindowID inWindowID, int x, int y, void* inRefcon) {
 }
 
 float update(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void *inRefcon) {
-    if (!AppState::getInstance()->pluginInitialized) {
-        return REFRESH_INTERVAL_SECONDS_SLOW;
-    }
+     if (!AppState::getInstance()->pluginInitialized) {
+         return REFRESH_INTERVAL_SECONDS_SLOW;
+     }
     
-    Dataref::getInstance()->update();
-    AppState::getInstance()->update();
-    AppState::getInstance()->statusbar->update();
+     Dataref::getInstance()->update();
+     AppState::getInstance()->update();
+     AppState::getInstance()->statusbar->update();
     
-    AppState::getInstance()->browser->update();
-    if (!AppState::getInstance()->browserVisible) {
-        return REFRESH_INTERVAL_SECONDS_FAST;
-    }
+     AppState::getInstance()->browser->update();
+     if (!AppState::getInstance()->browserVisible) {
+         return REFRESH_INTERVAL_SECONDS_FAST;
+     }
     
-    if (pressedKeyTime > 0 && XPLMGetElapsedTime() > pressedKeyTime + 0.3f) {
-        AppState::getInstance()->browser->key(pressedKeyCode);
-    }
+     if (pressedKeyTime > 0 && XPLMGetElapsedTime() > pressedKeyTime + 0.3f) {
+         AppState::getInstance()->browser->key(pressedKeyCode);
+     }
     
-    if (AppState::getInstance()->browser->hasInputFocus() != XPLMHasKeyboardFocus(window)) {
-        if (AppState::getInstance()->browser->hasInputFocus()) {
-            AppState::getInstance()->browser->setFocus(true);
-            XPLMBringWindowToFront(window);
-            XPLMTakeKeyboardFocus(window);
-        }
-        else {
-            AppState::getInstance()->browser->setFocus(false);
-            XPLMTakeKeyboardFocus(0);
-        }
-    }
+     if (AppState::getInstance()->browser->hasInputFocus() != XPLMHasKeyboardFocus(window)) {
+         if (AppState::getInstance()->browser->hasInputFocus()) {
+             AppState::getInstance()->browser->setFocus(true);
+             XPLMBringWindowToFront(window);
+             XPLMTakeKeyboardFocus(window);
+         }
+         else {
+             AppState::getInstance()->browser->setFocus(false);
+             XPLMTakeKeyboardFocus(0);
+         }
+     }
     
-    float mouseX, mouseY;
-    if (Dataref::getInstance()->getMouse(&mouseX, &mouseY)) {
-        AppState::getInstance()->browser->mouseMove(mouseX, mouseY);
-    }
+     float mouseX, mouseY;
+     if (Dataref::getInstance()->getMouse(&mouseX, &mouseY)) {
+         AppState::getInstance()->browser->mouseMove(mouseX, mouseY);
+     }
     
     return REFRESH_INTERVAL_SECONDS_FAST;
 }

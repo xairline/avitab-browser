@@ -9,8 +9,12 @@
 #include <XPLMProcessing.h>
 
 Statusbar::Statusbar() {
+    x = 0.0f;
     loading = false;
     noticeText = "";
+    activeTabTitle = "";
+    activeTabButton = nullptr;
+    spinnerImage = nullptr;
 }
 
 void Statusbar::initialize() {

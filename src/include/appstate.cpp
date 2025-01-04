@@ -16,6 +16,17 @@
 AppState* AppState::instance = nullptr;
 
 AppState::AppState() {
+    remoteVersion = "";
+    shouldBrowserVisible = false;
+    notification = nullptr;
+    mainMenuButton = nullptr;
+    aircraftVariant = VariantUnknown;
+    pluginInitialized = false;
+    hasPower = false;
+    browserVisible = false;
+    statusbar = nullptr;
+    browser = nullptr;
+    activeCursor = CursorDefault;
 }
 
 AppState::~AppState() {
@@ -56,11 +67,18 @@ bool AppState::initialize() {
         return false;
     }
     
+#ifdef XPLM410
     std::string aircraftName = Dataref::getInstance()->get<std::string>("sim/aircraft/view/acf_ui_name");
     if (aircraftName.empty()) {
         return false;
     }
     determineAircraftVariant(aircraftName);
+#else
+    // XP11 has the dataref below, but it is not filled at load-time and has non standard values. Skip special variants on XP11.
+    // std::string aircraftName = Dataref::getInstance()->get<std::string>("sim/aircraft/view/acf_descrip");
+    determineAircraftVariant("");
+#endif
+    
     
     statusbar->initialize();
     browser->initialize();
@@ -100,7 +118,7 @@ void AppState::deinitialize() {
 }
 
 void AppState::checkLatestVersion() {
-    if (latestVersionNumber > 0) {
+    if (!remoteVersion.empty()) {
         // Version information was already fetched. Only check once per session.
         return;
     }
@@ -113,23 +131,30 @@ void AppState::checkLatestVersion() {
         return size * nmemb;
     });
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "Mozilla/5.0");
-    curl_easy_perform(curl);
+    CURLcode status = curl_easy_perform(curl);
+    if (status != CURLE_OK) {
+        debug("Version fetch failed: %s\n", curl_easy_strerror(status));
+    }
     curl_easy_cleanup(curl);
 
     try {
         std::string tag = nlohmann::json::parse(response)[0]["tag_name"];
-        std::string cleaned = std::regex_replace(tag, std::regex("[^0-9]"), "");
-        latestVersionNumber = std::stoi(cleaned);
-        if (latestVersionNumber > VERSION) {
-            debug("There is a newer version of the plugin available. Current: %i, latest: %i\n", VERSION, latestVersionNumber);
+        std::string cleanedRemote = std::regex_replace(tag, std::regex("[^0-9]"), "");
+        std::string cleanedLocal = std::regex_replace(VERSION, std::regex("[^0-9]"), "");
+        int remoteVersionNumber = std::stoi(cleanedRemote);
+        int localVersionNumber = std::stoi(cleanedLocal);
+        if (remoteVersionNumber > localVersionNumber) {
+            debug("There is a newer version of the plugin available. Current: %s, latest: %s\n", VERSION, tag.c_str());
             std::string description = "There is an update available for the " + std::string(FRIENDLY_NAME) + " plugin.\n\nVersion " + tag + ".\n";
             showNotification(new Notification("Update available", description));
         }
     } catch (const std::exception& e) {
-        debug("Could not fetch latest version information from GitHub.\n");
+        debug("Could not fetch latest version information from GitHub. Reason: %s\n", e.what());
         // Assume we're on the latest version to prevent refetching
-        latestVersionNumber = VERSION;
+        remoteVersion = VERSION;
     }
 }
 
@@ -343,14 +368,18 @@ url_5=
         statusbar->destroy();
         statusbar->initialize();
         
-        std::string url = browser->currentUrl();
-        browser->visibilityWillChange(false);
-        browserVisible = false;
-        browser->destroy();
-        browser->initialize();
-        browser->loadUrl(url);
-        browser->visibilityWillChange(true);
-        browserVisible = true;
+        if (browser && browserVisible) {
+            std::string url = browser->currentUrl();
+            if (!url.empty()) {
+                browser->visibilityWillChange(false);
+                browserVisible = false;
+                browser->destroy();
+                browser->initialize();
+                browser->loadUrl(url);
+                browser->visibilityWillChange(true);
+                browserVisible = true;
+            }
+        }
     }
     
     return true;

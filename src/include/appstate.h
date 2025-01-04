@@ -50,15 +50,15 @@ private:
     AppState();
     ~AppState();
     static AppState* instance;
-    int latestVersionNumber;
+    std::string remoteVersion;
     bool shouldBrowserVisible;
     std::vector<DelayedTask> tasks;
     std::vector<Button *> buttons;
     Notification *notification;
+    Button *mainMenuButton;
     bool loadAvitabConfig();
     bool fileExists(std::string filename);
     void determineAircraftVariant(std::string friendlyName);
-    Button *mainMenuButton;
 
 public:
     AvitabDimensions tabletDimensions;

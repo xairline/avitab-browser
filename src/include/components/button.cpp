@@ -6,6 +6,7 @@
 #include <XPLMDisplay.h>
 
 Button::Button(float aWidth, float aHeight) : Image("") {
+    callback = nullptr;
     relativeWidth = aWidth;
     relativeHeight = aHeight;
     pixelsWidth = AppState::getInstance()->tabletDimensions.width * aWidth;

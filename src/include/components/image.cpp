@@ -12,6 +12,9 @@
 #include "nanosvgrast.h"
 
 Image::Image(std::string filename) {
+    x = 0;
+    y = 0;
+    rotationDegrees = 0;
     opacity = 1;
     textureId = 0;
     
@@ -19,7 +22,7 @@ Image::Image(std::string filename) {
         return;
     }
     
-    unsigned char *data;
+    unsigned char *data = nullptr;
     unsigned int error = 1;
     std::ifstream fileExistsHandle(filename);
     if (fileExistsHandle.good()) {
@@ -47,14 +50,16 @@ Image::Image(std::string filename) {
         return;
     }
 
-    XPLMGenerateTextureNumbers(&textureId, 1);
-    XPLMBindTexture2d(textureId, 0);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pixelsWidth, pixelsHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    free(data);
+    if (data) {
+        XPLMGenerateTextureNumbers(&textureId, 1);
+        XPLMBindTexture2d(textureId, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pixelsWidth, pixelsHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        free(data);
+    }
     
 #if SCALE_IMAGES
     // Images have been designed for 800px width resolution. Scale to size.

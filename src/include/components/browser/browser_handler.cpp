@@ -27,6 +27,7 @@ BrowserHandler::BrowserHandler(int aTextureId, unsigned short aWidth, unsigned s
     windowHeight = aHeight;
     cursorState = CursorDefault;
     hasInputFocus = false;
+    browserInstance = nullptr;
 }
 
 BrowserHandler::~BrowserHandler() {
@@ -49,14 +50,20 @@ void BrowserHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
 
 bool BrowserHandler::DoClose(CefRefPtr<CefBrowser> browser) {
     textureId = 0;
-    AppState::getInstance()->statusbar->setActiveTab("");
+    
+    if (AppState::getInstance()->statusbar) {
+        AppState::getInstance()->statusbar->setActiveTab("");
+    }
     return false;
 }
 
 void BrowserHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
     textureId = 0;
     browserInstance = nullptr;
-    AppState::getInstance()->statusbar->setActiveTab("");
+    
+    if (AppState::getInstance()->statusbar) {
+        AppState::getInstance()->statusbar->setActiveTab("");
+    }
 }
 
 

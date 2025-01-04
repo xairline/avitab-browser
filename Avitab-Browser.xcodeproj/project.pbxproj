@@ -696,7 +696,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/lib/cef",
 					"$(PROJECT_DIR)/lib/mac_x64/cef",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
@@ -760,7 +759,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/lib/cef",
 					"$(PROJECT_DIR)/lib/mac_x64/cef",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;

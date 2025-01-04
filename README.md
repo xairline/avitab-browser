@@ -1,6 +1,6 @@
 ## AviTab Browser
 
-For X-Plane 12.
+For X-Plane 11 and X-Plane 12.
 
 [Download at x-plane.org](https://forums.x-plane.org/index.php?/files/file/93812-avitab-browser-a-browser-addon-for-the-avitab-plugin/)
 

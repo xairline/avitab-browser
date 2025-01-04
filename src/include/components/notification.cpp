@@ -9,6 +9,13 @@
 #include "appstate.h"
 
 Notification::Notification(std::string aTitle, std::string body) {
+    dismissButton = nullptr;
+    x = 0.0f;
+    y = 0.0f;
+    width = 0.0f;
+    height = 0.0f;
+    opacity = 1.0f;
+    
     title = aTitle;
     shouldDelete = false;
     dismissButton = new Button(0.3f, 0.05f);
@@ -27,6 +34,7 @@ Notification::Notification(std::string aTitle, std::string body) {
     height = (topPadding + titleBodyPadding + (bodyLines.size() * bodyLineHeight) + buttonPadding + dismissButton->pixelsHeight + buttonPadding) / AppState::getInstance()->tabletDimensions.height;
     opacity = 0.4f;
     
+#ifdef XPLM410
     std::ifstream file(Path::getInstance()->pluginDirectory + "/assets/notify.pcm", std::ios::binary | std::ios::ate);
     if (file) {
         file.seekg(0, std::ios::beg);
@@ -36,6 +44,7 @@ Notification::Notification(std::string aTitle, std::string body) {
         
         XPLMPlayPCMOnBus(buffer.data(), (unsigned int)buffer.size(), FMOD_SOUND_FORMAT_PCM16, 22050, 1, 0, xplm_AudioInterior, nullptr, nullptr);
     }
+#endif
 }
 
 void Notification::update() {

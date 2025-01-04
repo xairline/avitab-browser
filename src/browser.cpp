@@ -31,6 +31,13 @@
 #endif
 
 Browser::Browser() {
+    textureId = 0;
+    offsetStart = 0.0f;
+    offsetEnd = 0.0f;
+    lastGpsUpdateTime = 0.0f;
+    backButton = nullptr;
+    handler = nullptr;
+    pendingUrl = "";
 }
 
 void Browser::initialize() {
@@ -103,11 +110,7 @@ void Browser::initialize() {
 }
 
 void Browser::destroy() {
-    if (handler) {
-//        if (CefCurrentlyOn(TID_UI)) {
-//            CefShutdown();
-//        }
-        
+    if (handler && handler->browserInstance) {
         handler->browserInstance->GetHost()->CloseBrowser(true);
         float graceTimeout = XPLMGetElapsedTime() + 5.0f;
         while (handler->browserInstance && XPLMGetElapsedTime() < graceTimeout) {
@@ -116,6 +119,12 @@ void Browser::destroy() {
         
         handler->destroy();
         handler = nullptr;
+        
+        // Never call CefShutdown(); since this makes all further CefInitialize(); crash.
+        // #if IBM
+        // debug("Cleaning up CEF instance...\n");
+        // CefShutdown();
+        // #endif
     }
     
     if (textureId) {
@@ -201,7 +210,7 @@ void Browser::draw() {
 }
 
 void Browser::mouseMove(float normalizedX, float normalizedY) {
-    if (!textureId || !handler) {
+    if (!textureId || !handler || !handler->browserInstance) {
         return;
     }
     
@@ -209,32 +218,32 @@ void Browser::mouseMove(float normalizedX, float normalizedY) {
     handler->browserInstance->GetHost()->SendMouseMoveEvent(mouseEvent, false);
 }
 
-bool Browser::click(XPLMMouseStatus status, float normalizedX, float normalizedY) {
-    if (!textureId || !handler) {
-        return false;
-    }
+ bool Browser::click(XPLMMouseStatus status, float normalizedX, float normalizedY) {
+     if (!textureId || !handler || !handler->browserInstance) {
+         return false;
+     }
     
-    CefMouseEvent mouseEvent = getMouseEvent(normalizedX, normalizedY);
-    if (mouseEvent.y < 0) {
-        return false;
-    }
+     CefMouseEvent mouseEvent = getMouseEvent(normalizedX, normalizedY);
+     if (mouseEvent.y < 0) {
+         return false;
+     }
     
-    if (status == xplm_MouseDown) {
-        handler->browserInstance->GetHost()->SendMouseClickEvent(mouseEvent, MBT_LEFT, false, 1);
-    }
-    else if (status == xplm_MouseDrag) {
-        // Yes, we already send this event in mouseMove(). Adding the line below makes it more responsive.
-        handler->browserInstance->GetHost()->SendMouseMoveEvent(mouseEvent, false);
-    }
-    else {
-        handler->browserInstance->GetHost()->SendMouseClickEvent(mouseEvent, MBT_LEFT, true, 1);
-    }
+     if (status == xplm_MouseDown) {
+         handler->browserInstance->GetHost()->SendMouseClickEvent(mouseEvent, MBT_LEFT, false, 1);
+     }
+     else if (status == xplm_MouseDrag) {
+         // Yes, we already send this event in mouseMove(). Adding the line below makes it more responsive.
+         handler->browserInstance->GetHost()->SendMouseMoveEvent(mouseEvent, false);
+     }
+     else {
+         handler->browserInstance->GetHost()->SendMouseClickEvent(mouseEvent, MBT_LEFT, true, 1);
+     }
     
-    return true;
-}
+     return true;
+ }
 
 void Browser::scroll(float normalizedX, float normalizedY, int clicks, bool horizontal = false) {
-    if (!textureId || !handler) {
+    if (!textureId || !handler || !handler->browserInstance) {
         return;
     }
     
@@ -309,6 +318,10 @@ void Browser::key(unsigned short key, XPLMKeyFlags flags) {
             keyEvent.native_key_code = KeyCodes::VKEY_UNKNOWN;
         }
         
+        #if IBM
+        keyEvent.windows_key_code = key;
+        #endif
+        
         keyEvent.is_system_key = false;
         keyEvent.modifiers = 0;
         if ((flags & xplm_ShiftFlag) == xplm_ShiftFlag) {
@@ -332,6 +345,8 @@ void Browser::key(unsigned short key, XPLMKeyFlags flags) {
         textEvent.type = KEYEVENT_CHAR;
         textEvent.character = key;
         textEvent.unmodified_character = key;
+        textEvent.native_key_code = keyEvent.native_key_code;
+        textEvent.windows_key_code = keyEvent.windows_key_code;
         
         if (keyEvent.type == KEYEVENT_KEYDOWN) {
             handler->browserInstance->GetHost()->SendKeyEvent(textEvent);
@@ -371,11 +386,9 @@ bool Browser::createBrowser() {
         debug("Could not load CEF library!\n");
         return false;
     }
+#else
+    debug("Starting libcef.dll... Expected version: %i.%i.%i\n", cef_version_info(0), cef_version_info(1), cef_version_info(2));
 #endif
-    
-    debug("Loading CEF library: %s\n", CEF_VERSION);
-    debug("Chrome version preproc: %i-%i-%i\n", CEF_VERSION_MAJOR, CEF_VERSION_MINOR, CEF_VERSION_PATCH);
-    debug("Chrome version runtime: %i-%i-%i\n", cef_version_info(0), cef_version_info(1), cef_version_info(2));
     
     CefRequestContextSettings context_settings;
     CefString(&context_settings.cache_path) = Path::getInstance()->pluginDirectory + "/cache";
@@ -421,10 +434,12 @@ bool Browser::createBrowser() {
         case xplm_Language_Chinese:
             language = "zh-CN,zh";
             break;
-            
+
+#ifdef XPLM410
         case xplm_Language_Ukrainian:
             language = "uk-UA,uk";
             break;
+#endif
             
         case xplm_Language_Unknown:
         default:
@@ -446,18 +461,46 @@ bool Browser::createBrowser() {
     CefBrowserSettings browser_settings;
     browser_settings.windowless_frame_rate = AppState::getInstance()->config.framerate;
     browser_settings.background_color = CefColorSetARGB(0xFF, 0xFF, 0xFF, 0xFF);
-    // Initialize CEF for the browser process. (this is already done by X-Plane)
-//    if (!CefInitialize(CefMainArgs(), settings, nullptr, nullptr)) {
-//        debug("CefInitialize failed.\n");
-//        return false;
-//    }
+    
+#if IBM
+    CefMainArgs main_args(GetModuleHandle(nullptr));
+    CefRefPtr<CefApp> app;
+    CefSettings settings;
+    settings.windowless_rendering_enabled = true;
+    CefString(&settings.cache_path) = Path::getInstance()->pluginDirectory + "/cache";
+    
+#ifdef XPLM410
+    // XP12
+    CefString(&settings.resources_dir_path) = Path::getInstance()->rootDirectory + "/Resources/dlls/64/cef/win";
+    CefString(&settings.locales_dir_path) = Path::getInstance()->rootDirectory + "/Resources/dlls/64/cef/win/locales";
+#else
+    // XP11
+//    CefString(&settings.resources_dir_path) = Path::getInstance()->rootDirectory + "/Resources/dlls/64/cef/win/resources";
+//    CefString(&settings.locales_dir_path) = Path::getInstance()->rootDirectory + "/Resources/dlls/64/cef/win/resources/locales";
+    
+    CefString(&settings.resources_dir_path) = Path::getInstance()->rootDirectory + "/Resources/dlls/64/cef/win";
+    CefString(&settings.locales_dir_path) = Path::getInstance()->rootDirectory + "/Resources/dlls/64/cef/win/locales";
+#endif
+    CefString(&settings.browser_subprocess_path) = Path::getInstance()->pluginDirectory + "/win_x64/cefSimpleHelper.exe";
+    
+    debug("Initializing a new CEF instance...\n");
+    if (!CefInitialize(main_args, settings, app, nullptr)) {
+        debug("Could not initialize CEF instance.\n");
+        return false;
+    }
+    debug("CEF instance has been set up successfully.\n");
+#endif
     handler = CefRefPtr<BrowserHandler>(new BrowserHandler(textureId, AppState::getInstance()->tabletDimensions.browserWidth, AppState::getInstance()->tabletDimensions.browserHeight));
     
     CefWindowInfo window_info;
     window_info.SetAsWindowless(nullptr);
     //window_info.shared_texture_enabled
     window_info.windowless_rendering_enabled = true;
-    CefBrowserHost::CreateBrowser(window_info, handler, !pendingUrl.empty() ? pendingUrl : AppState::getInstance()->config.homepage, browser_settings, nullptr, request_context);
+    bool browserCreated = CefBrowserHost::CreateBrowser(window_info, handler, !pendingUrl.empty() ? pendingUrl : AppState::getInstance()->config.homepage, browser_settings, nullptr, request_context);
+    if (!browserCreated) {
+        AppState::getInstance()->showNotification(new Notification("Error creating browser", "An error occured while starting the browser.\nPlease verify if there are any updates for the " FRIENDLY_NAME " plugin and try again."));
+    }
+    
     pendingUrl = "";
     
     return true;

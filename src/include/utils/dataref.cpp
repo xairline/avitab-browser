@@ -9,6 +9,11 @@ using namespace std;
 Dataref *Dataref::instance = nullptr;
 
 Dataref::Dataref() {
+    lastMouseX = 0.0f;
+    lastMouseY = 0.0f;
+    lastWindowX = 0;
+    lastWindowY = 0;
+    lastViewHeading = 0;
 }
 
 Dataref::~Dataref() {
@@ -157,6 +162,7 @@ void Dataref::set(const char* ref, T value) {
     else if constexpr (std::is_same<T, float>::value) {
         return XPLMSetDataf(handle, value);
     }
+    // TODO: Set binary data
 //    else if constexpr (std::is_same<T, std::string>::value) {
 //        int size = XPLMGetDatab(handle, nullptr, 0, 0);
 //        char str[size];
