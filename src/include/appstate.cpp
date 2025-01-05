@@ -67,18 +67,7 @@ bool AppState::initialize() {
         return false;
     }
     
-#ifdef XPLM410
-    std::string aircraftName = Dataref::getInstance()->get<std::string>("sim/aircraft/view/acf_ui_name");
-    if (aircraftName.empty()) {
-        return false;
-    }
-    determineAircraftVariant(aircraftName);
-#else
-    // XP11 has the dataref below, but it is not filled at load-time and has non standard values. Skip special variants on XP11.
-    // std::string aircraftName = Dataref::getInstance()->get<std::string>("sim/aircraft/view/acf_descrip");
-    determineAircraftVariant("");
-#endif
-    
+    determineAircraftVariant();
     
     statusbar->initialize();
     browser->initialize();
@@ -447,17 +436,13 @@ bool AppState::fileExists(std::string filename) {
     return true;
 }
 
-void AppState::determineAircraftVariant(std::string friendlyName) {
-    size_t pos = friendlyName.find("(4k)");
-    if (pos != std::string::npos) {
-        friendlyName.replace(pos, 4, "");
+void AppState::determineAircraftVariant() {
+    if (Path::getInstance()->aircraftDirectory.empty()) {
+        return;
     }
     
-    // Trim whitespace
-    friendlyName.erase(friendlyName.begin(), std::find_if(friendlyName.begin(), friendlyName.end(), [](unsigned char c) { return !std::isspace(c); }));
-    friendlyName.erase(std::find_if(friendlyName.rbegin(), friendlyName.rend(), [](unsigned char c) { return !std::isspace(c); }).base(), friendlyName.end());
-    
-    if (Path::getInstance()->aircraftFilename == "b738.acf" && friendlyName == "Boeing 737-800X") {
+    std::string ziboFolder = Path::getInstance()->aircraftDirectory + "/plugins/zibomod";
+    if (std::filesystem::exists(ziboFolder) && std::filesystem::is_directory(ziboFolder)) {
         aircraftVariant = VariantZibo738;
     }
     else {

@@ -58,7 +58,7 @@ private:
     Button *mainMenuButton;
     bool loadAvitabConfig();
     bool fileExists(std::string filename);
-    void determineAircraftVariant(std::string friendlyName);
+    void determineAircraftVariant();
 
 public:
     AvitabDimensions tabletDimensions;
