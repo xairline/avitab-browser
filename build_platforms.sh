@@ -26,6 +26,15 @@ for platform in $PLATFORMS; do
 done
 
 echo "Building for platforms: \033[1m$PLATFORMS\033[0m\n"
+
+echo "Which SDK version do you want to build with? (301/410):"
+read SDK_VERSION
+
+if [ -z "$SDK_VERSION" ]; then
+    SDK_VERSION=410
+fi
+
+echo "Building with SDK version $SDK_VERSION\n"
 echo "Clean build directory? (y/n):"
 read CLEAN_BUILD
 
@@ -38,7 +47,7 @@ fi
 
 for platform in $PLATFORMS; do
     echo "Building $platform..."
-    cmake -DCMAKE_TOOLCHAIN_FILE=toolchain-$platform.cmake -Bbuild/$platform -H.
+    cmake -DSDK_VERSION=$SDK_VERSION -DCMAKE_TOOLCHAIN_FILE=toolchain-$platform.cmake -Bbuild/$platform -H.
     make -C build/$platform
     if [ $? -eq 0 ]; then
         echo "\n\n"
@@ -70,12 +79,18 @@ for platform in $AVAILABLE_PLATFORMS; do
 done
 
 cp -r assets build/dist
-mkdir -p build/dist/cache
 default_ini=$(sed -n '/const char \*defaultConfig = R"(/,/^)";/p' "./src/include/appstate.cpp" | sed '$d' | sed '1s/const char \*defaultConfig = R"(//' | sed 's/^[ \t]*//')
 echo "$default_ini" > build/dist/config.ini
 
 cd build
 mv dist $PROJECT_NAME
+
+if [ $SDK_VERSION -lt 400 ]; then
+    VERSION=$VERSION-XP11
+else
+    VERSION=$VERSION-XP12
+fi
+
 zip -rq $PROJECT_NAME-$VERSION.zip $PROJECT_NAME
 mv $PROJECT_NAME dist
 cd ..

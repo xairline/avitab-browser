@@ -28,7 +28,7 @@ public:
     bool exists(const char *ref);
     template <typename T> T getCached(const char *ref);
     template <typename T> T get(const char *ref);
-    template <typename T> void set(const char* ref, T value);
+    template <typename T> void set(const char* ref, T value, bool setCacheOnly = false);
     
     void executeCommand(const char *command);
     void createCommand();

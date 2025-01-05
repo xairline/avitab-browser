@@ -1,23 +1,4 @@
 #include "browser.h"
-#include <iomanip>
-#include <sstream>
-#include <include/cef_base.h>
-#include <include/base/cef_callback.h>
-#include <include/cef_version.h>
-#include <include/cef_base.h>
-#include <include/cef_app.h>
-#include <include/cef_browser.h>
-#include <include/cef_client.h>
-#include <include/cef_render_handler.h>
-#include <include/cef_command_line.h>
-#include <include/wrapper/cef_helpers.h>
-#include <include/base/cef_bind.h>
-#include <include/base/cef_callback.h>
-#include <include/wrapper/cef_closure_task.h>
-#include <include/cef_request_context_handler.h>
-#include <XPLMUtilities.h>
-#include <XPLMGraphics.h>
-#include <XPLMProcessing.h>
 #include "config.h"
 #include "path.h"
 #include "appstate.h"
@@ -25,6 +6,25 @@
 #include "browser_handler.h"
 #include "keycodes.h"
 #include "drawing.h"
+#include <iomanip>
+#include <sstream>
+#include <chrono>
+#include <filesystem>
+#include <include/cef_app.h>
+#include <include/cef_base.h>
+#include <include/base/cef_callback.h>
+#include <include/cef_version.h>
+#include <include/cef_browser.h>
+#include <include/cef_client.h>
+#include <include/cef_render_handler.h>
+#include <include/cef_command_line.h>
+#include <include/wrapper/cef_helpers.h>
+#include <include/base/cef_bind.h>
+#include <include/wrapper/cef_closure_task.h>
+#include <include/cef_request_context_handler.h>
+#include <XPLMUtilities.h>
+#include <XPLMGraphics.h>
+#include <XPLMProcessing.h>
 
 #if APL
 #include <include/wrapper/cef_library_loader.h>
@@ -112,9 +112,20 @@ void Browser::initialize() {
 void Browser::destroy() {
     if (handler && handler->browserInstance) {
         handler->browserInstance->GetHost()->CloseBrowser(true);
-        float graceTimeout = XPLMGetElapsedTime() + 5.0f;
-        while (handler->browserInstance && XPLMGetElapsedTime() < graceTimeout) {
+        
+        auto startTime = std::chrono::steady_clock::now() + std::chrono::seconds(99);
+        auto gracePeriod = std::chrono::milliseconds(500);
+        while (1) {
+            // Get some message loop reps in so the browser can properly close.
             CefDoMessageLoopWork();
+            
+            if (!handler->browserInstance && startTime > std::chrono::steady_clock::now()) {
+                // The browser has closed. Start grace countdown.
+                startTime = std::chrono::steady_clock::now();
+            }
+            else if (std::chrono::steady_clock::now() - startTime > gracePeriod) {
+                break;
+            }
         }
         
         handler->destroy();
@@ -390,8 +401,13 @@ bool Browser::createBrowser() {
     debug("Starting libcef.dll... Expected version: %i.%i.%i\n", cef_version_info(0), cef_version_info(1), cef_version_info(2));
 #endif
     
+    std::string cachePath = Path::getInstance()->pluginDirectory + "/cache";
+    if (!std::filesystem::exists(cachePath)) {
+        std::filesystem::create_directories(cachePath);
+    }
+    
     CefRequestContextSettings context_settings;
-    CefString(&context_settings.cache_path) = Path::getInstance()->pluginDirectory + "/cache";
+    CefString(&context_settings.cache_path) = cachePath;
     
     std::string language = "";
     switch (XPLMLanguageCode()) {
@@ -461,27 +477,24 @@ bool Browser::createBrowser() {
     CefBrowserSettings browser_settings;
     browser_settings.windowless_frame_rate = AppState::getInstance()->config.framerate;
     browser_settings.background_color = CefColorSetARGB(0xFF, 0xFF, 0xFF, 0xFF);
-    
+
 #if IBM
     CefMainArgs main_args(GetModuleHandle(nullptr));
     CefRefPtr<CefApp> app;
     CefSettings settings;
     settings.windowless_rendering_enabled = true;
-    CefString(&settings.cache_path) = Path::getInstance()->pluginDirectory + "/cache";
+    CefString(&settings.cache_path) = cachePath;
     
-#ifdef XPLM410
-    // XP12
-    CefString(&settings.resources_dir_path) = Path::getInstance()->rootDirectory + "/Resources/dlls/64/cef/win";
-    CefString(&settings.locales_dir_path) = Path::getInstance()->rootDirectory + "/Resources/dlls/64/cef/win/locales";
-#else
-    // XP11
-//    CefString(&settings.resources_dir_path) = Path::getInstance()->rootDirectory + "/Resources/dlls/64/cef/win/resources";
-//    CefString(&settings.locales_dir_path) = Path::getInstance()->rootDirectory + "/Resources/dlls/64/cef/win/resources/locales";
+    // In XP11, CEF is located in /Resources/dlls/64/cef/win/resources and /Resources/dlls/64/cef/win/resources/locales
+    // In XP12, CEF is located in /Resources/dlls/64/cef/win and /Resources/dlls/64/cef/win/locales
+    // The XP11 CEF version is a completely different version. So we use paths in our plugin directory instead.
     
-    CefString(&settings.resources_dir_path) = Path::getInstance()->rootDirectory + "/Resources/dlls/64/cef/win";
-    CefString(&settings.locales_dir_path) = Path::getInstance()->rootDirectory + "/Resources/dlls/64/cef/win/locales";
-#endif
-    CefString(&settings.browser_subprocess_path) = Path::getInstance()->pluginDirectory + "/win_x64/cefSimpleHelper.exe";
+//    CefString(&settings.resources_dir_path) = Path::getInstance()->rootDirectory + "/Resources/dlls/64/cef/win";
+//    CefString(&settings.locales_dir_path) = Path::getInstance()->rootDirectory + "/Resources/dlls/64/cef/win/locales";
+    
+    CefString(&settings.resources_dir_path) = Path::getInstance()->pluginDirectory + "/win_x64/res";
+    CefString(&settings.locales_dir_path) = Path::getInstance()->pluginDirectory + "/win_x64/res/locales";
+    CefString(&settings.browser_subprocess_path) = Path::getInstance()->pluginDirectory + "/win_x64/avitab_cef_helper.exe";
     
     debug("Initializing a new CEF instance...\n");
     if (!CefInitialize(main_args, settings, app, nullptr)) {

@@ -89,7 +89,7 @@ PLUGIN_API int XPluginStart(char * name, char * sig, char * desc)
     
     XPluginReceiveMessage(0, XPLM_MSG_PLANE_LOADED, nullptr);
     
-    debug("Plugin started (v%s)\n", VERSION);
+    debug("Plugin started (version %s)\n", VERSION);
     return 1;
 }
 

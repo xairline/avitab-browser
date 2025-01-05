@@ -147,20 +147,26 @@ T Dataref::get(const char *ref) {
     }
 }
 
-template void Dataref::set<float>(const char* ref, float value);
-template void Dataref::set<int>(const char* ref, int value);
+template void Dataref::set<float>(const char* ref, float value, bool setCacheOnly);
+template void Dataref::set<int>(const char* ref, int value, bool setCacheOnly);
 template <typename T>
-void Dataref::set(const char* ref, T value) {
+void Dataref::set(const char* ref, T value, bool setCacheOnly) {
     XPLMDataRef handle = findRef(ref);
     if (!handle) {
         return;
     }
     
+    cachedValues[ref] = value;
+    
     if constexpr (std::is_same<T, int>::value) {
-        return XPLMSetDatai(handle, value);
+        if (!setCacheOnly) {
+            XPLMSetDatai(handle, value);
+        }
     }
     else if constexpr (std::is_same<T, float>::value) {
-        return XPLMSetDataf(handle, value);
+        if (!setCacheOnly) {
+            XPLMSetDataf(handle, value);
+        }
     }
     // TODO: Set binary data
 //    else if constexpr (std::is_same<T, std::string>::value) {

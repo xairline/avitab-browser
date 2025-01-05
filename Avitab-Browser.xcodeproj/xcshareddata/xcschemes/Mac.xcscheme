@@ -17,7 +17,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "D607B19809A556E400699BC3"
                BuildableName = "avitab-browser.xpl"
-               BlueprintName = "avitab-browser-mac"
+               BlueprintName = "avitab-browser"
                ReferencedContainer = "container:Avitab-Browser.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
