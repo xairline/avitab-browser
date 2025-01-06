@@ -5,6 +5,10 @@ VERSION=$(grep "#define VERSION " src/include/config.h | cut -d " " -f 3 | tr -d
 echo "Building $PROJECT_NAME.xpl version $VERSION. Is this correct? (y/n):"
 read CONFIRM
 
+if [ -z "$CONFIRM" ]; then
+    CONFIRM="y"
+fi
+
 if [ "$CONFIRM" != "y" ]; then
     echo "Please update the version number in config.h and try again."
     exit 1
@@ -38,6 +42,10 @@ echo "Building with SDK version $SDK_VERSION\n"
 echo "Clean build directory? (y/n):"
 read CLEAN_BUILD
 
+if [ -z "$CLEAN_BUILD" ]; then
+    CLEAN_BUILD="n"
+fi
+
 if [ "$CLEAN_BUILD" = "y" ]; then
     echo "Cleaning build directories..."
     if [ -d "build" ]; then
@@ -47,7 +55,7 @@ fi
 
 for platform in $PLATFORMS; do
     echo "Building $platform..."
-    cmake -DSDK_VERSION=$SDK_VERSION -DCMAKE_TOOLCHAIN_FILE=toolchain-$platform.cmake -Bbuild/$platform -H.
+    cmake -DCMAKE_TOOLCHAIN_FILE=toolchain-$platform.cmake -DSDK_VERSION=$SDK_VERSION -Bbuild/$platform -H.
     make -C build/$platform
     if [ $? -eq 0 ]; then
         echo "\n\n"
@@ -60,7 +68,7 @@ for platform in $PLATFORMS; do
     fi
 done
 
-echo "Building done."
+echo "Building has finished."
 
 echo "Creating distribution bundle..."
 if [ -d "build/dist" ]; then
@@ -73,8 +81,8 @@ for platform in $AVAILABLE_PLATFORMS; do
         cp build/$platform/${platform}_x64/${PROJECT_NAME}.xpl build/dist/${platform}_x64/${PROJECT_NAME}.xpl
     fi
 
-    if [ -d "lib/${platform}_x64/dist" ]; then
-        cp -r lib/${platform}_x64/dist/* build/dist/${platform}_x64
+    if [ -d "lib/${platform}_x64/dist_${SDK_VERSION}" ]; then
+        cp -r lib/${platform}_x64/dist_${SDK_VERSION}/* build/dist/${platform}_x64
     fi
 done
 
@@ -91,7 +99,8 @@ else
     VERSION=$VERSION-XP12
 fi
 
-zip -rq $PROJECT_NAME-$VERSION.zip $PROJECT_NAME
+rm -f $PROJECT_NAME-$VERSION.zip
+zip -rq $PROJECT_NAME-$VERSION.zip $PROJECT_NAME -x ".DS_Store" -x "__MACOSX"
 mv $PROJECT_NAME dist
 cd ..
 

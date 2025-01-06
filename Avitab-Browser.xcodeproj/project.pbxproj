@@ -17,6 +17,28 @@
 		F63C14262D12C63E00932475 /* INIReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F63C14222D12C63E00932475 /* INIReader.cpp */; };
 		F63C14272D12C63E00932475 /* ini.c in Sources */ = {isa = PBXBuildFile; fileRef = F63C14202D12C63E00932475 /* ini.c */; };
 		F63C14302D12CB7B00932475 /* lodepng.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F63C142B2D12CB7B00932475 /* lodepng.cpp */; };
+		F64CFE5E2D2C31E8009BE82B /* cursor.mm in Sources */ = {isa = PBXBuildFile; fileRef = F6AF9EC82D078EC200530297 /* cursor.mm */; };
+		F64CFE5F2D2C31E8009BE82B /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F66F91662D0332F600F84283 /* main.cpp */; };
+		F64CFE602D2C31E8009BE82B /* button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F61F8B262D059ED500E63C3F /* button.cpp */; };
+		F64CFE612D2C31E8009BE82B /* image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F61F8B282D059ED500E63C3F /* image.cpp */; };
+		F64CFE622D2C31E8009BE82B /* statusbar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F66D0E012D039EC400E5E93D /* statusbar.cpp */; };
+		F64CFE632D2C31E8009BE82B /* path.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6AF9EBE2D06F84900530297 /* path.cpp */; };
+		F64CFE642D2C31E8009BE82B /* notification.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6EB77692D21FFF2000B96F3 /* notification.cpp */; };
+		F64CFE652D2C31E8009BE82B /* drawing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F64EE9C02D24130F000E68D2 /* drawing.cpp */; };
+		F64CFE662D2C31E8009BE82B /* INIReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F63C14222D12C63E00932475 /* INIReader.cpp */; };
+		F64CFE672D2C31E8009BE82B /* ini.c in Sources */ = {isa = PBXBuildFile; fileRef = F63C14202D12C63E00932475 /* ini.c */; };
+		F64CFE682D2C31E8009BE82B /* browser_handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6602C0B2D0C8B2B00204B65 /* browser_handler.cpp */; };
+		F64CFE692D2C31E8009BE82B /* lodepng.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F63C142B2D12CB7B00932475 /* lodepng.cpp */; };
+		F64CFE6A2D2C31E8009BE82B /* appstate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6AF9ECB2D078ED400530297 /* appstate.cpp */; };
+		F64CFE6B2D2C31E8009BE82B /* dataref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6AF9EBC2D06F84900530297 /* dataref.cpp */; };
+		F64CFE6C2D2C31E8009BE82B /* browser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F66F916C2D0333A400F84283 /* browser.cpp */; };
+		F64CFE6E2D2C31E8009BE82B /* XPWidgets.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F674E6F32D2ACDC600CCE11F /* XPWidgets.framework */; };
+		F64CFE6F2D2C31E8009BE82B /* XPLM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F674E6F42D2ACDC600CCE11F /* XPLM.framework */; };
+		F64CFE702D2C31E8009BE82B /* libcef_dll_wrapper.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F62DB14B2D26A5180048FCC6 /* libcef_dll_wrapper.a */; };
+		F64CFE712D2C31E8009BE82B /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F6A0452C2D25E33700A0FFA3 /* libcurl.tbd */; platformFilters = (maccatalyst, macos, ); };
+		F64CFE722D2C31E8009BE82B /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F691E46C2D0338E90000666C /* CoreFoundation.framework */; };
+		F64CFE732D2C31E8009BE82B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F691E46E2D0338F10000666C /* OpenGL.framework */; };
+		F64CFE742D2C31E8009BE82B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6AF9EC52D078DB000530297 /* Cocoa.framework */; };
 		F64EE9C22D24130F000E68D2 /* drawing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F64EE9C02D24130F000E68D2 /* drawing.cpp */; };
 		F6602C0F2D0C8B2B00204B65 /* browser_handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6602C0B2D0C8B2B00204B65 /* browser_handler.cpp */; };
 		F674E6F52D2ACDC600CCE11F /* XPWidgets.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F674E6F32D2ACDC600CCE11F /* XPWidgets.framework */; };
@@ -62,6 +84,7 @@
 		F63C142B2D12CB7B00932475 /* lodepng.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = lodepng.cpp; sourceTree = "<group>"; };
 		F63C142D2D12CB7B00932475 /* nanosvg.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nanosvg.h; sourceTree = "<group>"; };
 		F63C142E2D12CB7B00932475 /* nanosvgrast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nanosvgrast.h; sourceTree = "<group>"; };
+		F64CFE7B2D2C31E8009BE82B /* avitab-browser-xp11.xpl */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "avitab-browser-xp11.xpl"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F64EE9BF2D24130F000E68D2 /* drawing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = drawing.h; sourceTree = "<group>"; };
 		F64EE9C02D24130F000E68D2 /* drawing.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = drawing.cpp; sourceTree = "<group>"; };
 		F6602C0A2D0C8B2B00204B65 /* browser_handler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = browser_handler.h; sourceTree = "<group>"; };
@@ -105,6 +128,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F64CFE6D2D2C31E8009BE82B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F64CFE6E2D2C31E8009BE82B /* XPWidgets.framework in Frameworks */,
+				F64CFE6F2D2C31E8009BE82B /* XPLM.framework in Frameworks */,
+				F64CFE702D2C31E8009BE82B /* libcef_dll_wrapper.a in Frameworks */,
+				F64CFE712D2C31E8009BE82B /* libcurl.tbd in Frameworks */,
+				F64CFE722D2C31E8009BE82B /* CoreFoundation.framework in Frameworks */,
+				F64CFE732D2C31E8009BE82B /* OpenGL.framework in Frameworks */,
+				F64CFE742D2C31E8009BE82B /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -121,6 +158,7 @@
 			isa = PBXGroup;
 			children = (
 				D607B19909A556E400699BC3 /* avitab-browser.xpl */,
+				F64CFE7B2D2C31E8009BE82B /* avitab-browser-xp11.xpl */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -273,6 +311,22 @@
 			productReference = D607B19909A556E400699BC3 /* avitab-browser.xpl */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
+		F64CFE5C2D2C31E8009BE82B /* avitab-browser-xp11 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F64CFE782D2C31E8009BE82B /* Build configuration list for PBXNativeTarget "avitab-browser-xp11" */;
+			buildPhases = (
+				F64CFE5D2D2C31E8009BE82B /* Sources */,
+				F64CFE6D2D2C31E8009BE82B /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "avitab-browser-xp11";
+			productName = StarterPlugin;
+			productReference = F64CFE7B2D2C31E8009BE82B /* avitab-browser-xp11.xpl */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -296,6 +350,7 @@
 			projectRoot = "";
 			targets = (
 				D607B19809A556E400699BC3 /* avitab-browser */,
+				F64CFE5C2D2C31E8009BE82B /* avitab-browser-xp11 */,
 			);
 		};
 /* End PBXProject section */
@@ -343,6 +398,28 @@
 				F6AF9ECC2D078ED400530297 /* appstate.cpp in Sources */,
 				F6AF9EC12D06F84900530297 /* dataref.cpp in Sources */,
 				F61F8B1C2D04549800E63C3F /* browser.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F64CFE5D2D2C31E8009BE82B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F64CFE5E2D2C31E8009BE82B /* cursor.mm in Sources */,
+				F64CFE5F2D2C31E8009BE82B /* main.cpp in Sources */,
+				F64CFE602D2C31E8009BE82B /* button.cpp in Sources */,
+				F64CFE612D2C31E8009BE82B /* image.cpp in Sources */,
+				F64CFE622D2C31E8009BE82B /* statusbar.cpp in Sources */,
+				F64CFE632D2C31E8009BE82B /* path.cpp in Sources */,
+				F64CFE642D2C31E8009BE82B /* notification.cpp in Sources */,
+				F64CFE652D2C31E8009BE82B /* drawing.cpp in Sources */,
+				F64CFE662D2C31E8009BE82B /* INIReader.cpp in Sources */,
+				F64CFE672D2C31E8009BE82B /* ini.c in Sources */,
+				F64CFE682D2C31E8009BE82B /* browser_handler.cpp in Sources */,
+				F64CFE692D2C31E8009BE82B /* lodepng.cpp in Sources */,
+				F64CFE6A2D2C31E8009BE82B /* appstate.cpp in Sources */,
+				F64CFE6B2D2C31E8009BE82B /* dataref.cpp in Sources */,
+				F64CFE6C2D2C31E8009BE82B /* browser.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -631,6 +708,126 @@
 			};
 			name = Release;
 		};
+		F64CFE792D2C31E8009BE82B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
+				ARCHS = x86_64;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(XPSDK_ROOT)/Libraries/Mac",
+					"$(PROJECT_DIR)/SDK_410/Libraries/Mac",
+					"$(PROJECT_DIR)/lib/mac_x64/cef",
+					"$(PROJECT_DIR)",
+				);
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"APL=1",
+					"IBM=0",
+					"LIN=0",
+					"XPLM200=1",
+					"XPLM210=1",
+					"XPLM300=1",
+					"XPLM301=1",
+					"XPLM302=1",
+					"XPLM303=1",
+					"DEBUG=1",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(XPSDK_ROOT)/CHeaders/Widgets",
+					"$(XPSDK_ROOT)/CHeaders/XPLM",
+					"$(HEADER_SEARCH_PATHS)",
+					"$(PROJECT_DIR)/lib/mac_x64/cef",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/lib/mac_x64/cef",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DNDEBUG",
+				);
+				OTHER_LDFLAGS = (
+					"$(OTHER_LDFLAGS)",
+					"-Wl,-exported_symbol",
+					"-Wl,_XPluginStart",
+					"-Wl,-exported_symbol",
+					"-Wl,_XPluginEnable",
+					"-Wl,-exported_symbol",
+					"-Wl,_XPluginReceiveMessage",
+					"-Wl,-exported_symbol",
+					"-Wl,_XPluginDisable",
+					"-Wl,-exported_symbol",
+					"-Wl,_XPluginStop",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "xrsimulator xros watchsimulator watchos macosx iphonesimulator iphoneos driverkit appletvsimulator appletvos";
+				SUPPORTS_MACCATALYST = YES;
+				XPSDK_ROOT = SDK_301;
+			};
+			name = Debug;
+		};
+		F64CFE7A2D2C31E8009BE82B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
+				ARCHS = x86_64;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(XPSDK_ROOT)/Libraries/Mac",
+					"$(PROJECT_DIR)/SDK_410/Libraries/Mac",
+					"$(PROJECT_DIR)/lib/mac_x64/cef",
+					"$(PROJECT_DIR)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"APL=1",
+					"IBM=0",
+					"LIN=0",
+					"XPLM200=1",
+					"XPLM210=1",
+					"XPLM300=1",
+					"XPLM301=1",
+					"XPLM302=1",
+					"XPLM303=1",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(XPSDK_ROOT)/CHeaders/Widgets",
+					"$(XPSDK_ROOT)/CHeaders/XPLM",
+					"$(HEADER_SEARCH_PATHS)",
+					"$(PROJECT_DIR)/lib/mac_x64/cef",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/lib/mac_x64/cef",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DNDEBUG",
+				);
+				OTHER_LDFLAGS = (
+					"$(OTHER_LDFLAGS)",
+					"-Wl,-exported_symbol",
+					"-Wl,_XPluginStart",
+					"-Wl,-exported_symbol",
+					"-Wl,_XPluginEnable",
+					"-Wl,-exported_symbol",
+					"-Wl,_XPluginReceiveMessage",
+					"-Wl,-exported_symbol",
+					"-Wl,_XPluginDisable",
+					"-Wl,-exported_symbol",
+					"-Wl,_XPluginStop",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "xrsimulator xros watchsimulator watchos macosx iphonesimulator iphoneos driverkit appletvsimulator appletvos";
+				SUPPORTS_MACCATALYST = YES;
+				XPSDK_ROOT = SDK_301;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -648,6 +845,15 @@
 			buildConfigurations = (
 				D607B19C09A556E400699BC3 /* Debug */,
 				D607B19D09A556E400699BC3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F64CFE782D2C31E8009BE82B /* Build configuration list for PBXNativeTarget "avitab-browser-xp11" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F64CFE792D2C31E8009BE82B /* Debug */,
+				F64CFE7A2D2C31E8009BE82B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

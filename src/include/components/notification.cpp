@@ -2,7 +2,9 @@
 #include "drawing.h"
 #include <XPLMGraphics.h>
 #include <XPLMUtilities.h>
+#ifdef XPLM410
 #include <XPLMSound.h>
+#endif
 #include <fstream>
 #include "config.h"
 #include "path.h"

@@ -1,6 +1,7 @@
 #ifndef BROWSER_H
 #define BROWSER_H
 
+#include <XPLMDisplay.h>
 #include <XPLMDefs.h>
 #include "button.h"
 

@@ -132,12 +132,12 @@ T Dataref::get(const char *ref) {
     else if constexpr (std::is_same<T, float>::value) {
         return XPLMGetDataf(handle);
     }
-    else if constexpr (std::is_same<T, std::string>::value) {
+    /*else if constexpr (std::is_same<T, std::string>::value) {
         int size = XPLMGetDatab(handle, nullptr, 0, 0);
         char str[size];
         XPLMGetDatab(handle, &str, 0, size);
         return std::string(str);
-    }
+    }*/
     
     if constexpr (std::is_same<T, std::string>::value) {
         return "";

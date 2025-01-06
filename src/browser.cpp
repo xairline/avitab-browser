@@ -25,6 +25,7 @@
 #include <XPLMUtilities.h>
 #include <XPLMGraphics.h>
 #include <XPLMProcessing.h>
+#include <XPLMDisplay.h>
 
 #if APL
 #include <include/wrapper/cef_library_loader.h>
@@ -394,11 +395,9 @@ bool Browser::createBrowser() {
 #if APL
     CefScopedLibraryLoader library_loader;
     if (!library_loader.LoadInMain()) {
-        debug("Could not load CEF library!\n");
+        debug("Could not load CEF library dylib (CefScopedLibraryLoader)!\n");
         return false;
     }
-#else
-    debug("Starting libcef.dll... Expected version: %i.%i.%i\n", cef_version_info(0), cef_version_info(1), cef_version_info(2));
 #endif
     
     std::string cachePath = Path::getInstance()->pluginDirectory + "/cache";
@@ -478,31 +477,35 @@ bool Browser::createBrowser() {
     browser_settings.windowless_frame_rate = AppState::getInstance()->config.framerate;
     browser_settings.background_color = CefColorSetARGB(0xFF, 0xFF, 0xFF, 0xFF);
 
-#if IBM
-    CefMainArgs main_args(GetModuleHandle(nullptr));
+#ifndef XPLM410
+    // CEF is not automatically loaded when starting X-Plane 11. Initialize CEF.
     CefRefPtr<CefApp> app;
     CefSettings settings;
     settings.windowless_rendering_enabled = true;
     CefString(&settings.cache_path) = cachePath;
     
-    // In XP11, CEF is located in /Resources/dlls/64/cef/win/resources and /Resources/dlls/64/cef/win/resources/locales
-    // In XP12, CEF is located in /Resources/dlls/64/cef/win and /Resources/dlls/64/cef/win/locales
-    // The XP11 CEF version is a completely different version. So we use paths in our plugin directory instead.
-    
-//    CefString(&settings.resources_dir_path) = Path::getInstance()->rootDirectory + "/Resources/dlls/64/cef/win";
-//    CefString(&settings.locales_dir_path) = Path::getInstance()->rootDirectory + "/Resources/dlls/64/cef/win/locales";
-    
+#if IBM
+    CefMainArgs main_args(GetModuleHandle(nullptr));
     CefString(&settings.resources_dir_path) = Path::getInstance()->pluginDirectory + "/win_x64/res";
     CefString(&settings.locales_dir_path) = Path::getInstance()->pluginDirectory + "/win_x64/res/locales";
     CefString(&settings.browser_subprocess_path) = Path::getInstance()->pluginDirectory + "/win_x64/avitab_cef_helper.exe";
+#elif APL
+    CefMainArgs main_args;
+//    CefString(&settings.resources_dir_path) = Path::getInstance()->pluginDirectory + "/win_x64/res";
+//    CefString(&settings.locales_dir_path) = Path::getInstance()->pluginDirectory + "/win_x64/res/locales";
+    CefString(&settings.framework_dir_path) = Path::getInstance()->pluginDirectory + "/mac_x64/Chromium Embedded Framework.framework";
+    CefString(&settings.browser_subprocess_path) = Path::getInstance()->pluginDirectory + "/mac_x64/cefclient Helper.app/Contents/MacOS/cefclient Helper";
+#elif LIN
+#endif
     
-    debug("Initializing a new CEF instance...\n");
+    debug("Initializing a new CEF instance for X-Plane 11...\n");
     if (!CefInitialize(main_args, settings, app, nullptr)) {
         debug("Could not initialize CEF instance.\n");
         return false;
     }
-    debug("CEF instance has been set up successfully.\n");
+    debug("CEF instance for X-Plane 11 has been set up successfully.\n");
 #endif
+    
     handler = CefRefPtr<BrowserHandler>(new BrowserHandler(textureId, AppState::getInstance()->tabletDimensions.browserWidth, AppState::getInstance()->tabletDimensions.browserHeight));
     
     CefWindowInfo window_info;
