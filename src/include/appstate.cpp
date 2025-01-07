@@ -246,15 +246,11 @@ void AppState::showBrowser(std::string url) {
         if (aircraftVariant == VariantZibo738) {
             Dataref::getInstance()->executeCommand("laminar/B738/tab/home");
             Dataref::getInstance()->executeCommand("laminar/B738/tab/spec");
-            
-            Dataref::getInstance()->set<int>("laminar/B738/tab/menu_page", 8, true);
         }
         else {
             Dataref::getInstance()->executeCommand("AviTab/app_about");
-            Dataref::getInstance()->set<int>("avitab/is_in_menu", 0, true);
         }
         shouldBrowserVisible = true;
-        update();
     }
     
     if (!url.empty()) {
