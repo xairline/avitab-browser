@@ -303,7 +303,7 @@ void Browser::setFocus(bool focus) {
     handler->browserInstance->GetHost()->SetFocus(focus);
 }
 
-void Browser::key(unsigned short key, XPLMKeyFlags flags) {
+void Browser::key(unsigned short key, unsigned short virtualKey, XPLMKeyFlags flags) {
     if (!textureId || !handler) {
         return;
     }
@@ -311,58 +311,53 @@ void Browser::key(unsigned short key, XPLMKeyFlags flags) {
     CefKeyEvent keyEvent;
     keyEvent.type = (flags == 0 || (flags & xplm_DownFlag) == xplm_DownFlag) ? KEYEVENT_KEYDOWN : KEYEVENT_KEYUP;
     
-//#if APL
-//    if (keyEvent.type == KEYEVENT_KEYUP) {
-//        return;
-//    }
-//#endif
+#if IBM
+    wchar_t utf16Character;
+    MultiByteToWideChar(CP_UTF8, 0, (char*)&key, 1, &utf16Character, 1);
+    keyEvent.windows_key_code = virtualKey;
+    keyEvent.native_key_code = MapVirtualKey(virtualKey, MAPVK_VK_TO_VSC);
+    keyEvent.character = utf16Character;
+    keyEvent.unmodified_character = keyEvent.character;
+#elif APL
+    auto it = KeyCodes::table.find(virtualKey);
+    if (it != KeyCodes::table.end()) {
+        int keyCode = it->second;
+        keyEvent.native_key_code = keyCode;
+    }
+    else {
+        keyEvent.native_key_code = key;
+    }
+    keyEvent.windows_key_code = virtualKey;
+    keyEvent.character = key;
+    keyEvent.unmodified_character = keyEvent.character;
+#endif
+
+    keyEvent.is_system_key = false;
+    keyEvent.modifiers = 0;
+    if ((flags & xplm_ShiftFlag) == xplm_ShiftFlag) {
+        keyEvent.modifiers |= EVENTFLAG_SHIFT_DOWN;
+    }
     
-    if (keyEvent.type == KEYEVENT_KEYDOWN) {
-        auto it = KeyCodes::table.find(key);
-        if (it != KeyCodes::table.end()) {
-            int keyCode = it->second;
-            keyEvent.windows_key_code = keyCode;
-            keyEvent.native_key_code = keyCode;
-        } else {
-            // Missing key
-            debug("Missing key (ascii): %02X\n", key);
-            keyEvent.windows_key_code = KeyCodes::VKEY_UNKNOWN;
-            keyEvent.native_key_code = KeyCodes::VKEY_UNKNOWN;
-        }
-        
-        #if IBM
-        keyEvent.windows_key_code = key;
-        #endif
-        
-        keyEvent.is_system_key = false;
-        keyEvent.modifiers = 0;
-        if ((flags & xplm_ShiftFlag) == xplm_ShiftFlag) {
-            keyEvent.modifiers |= EVENTFLAG_SHIFT_DOWN;
-        }
-        
-        if ((flags & xplm_OptionAltFlag) == xplm_OptionAltFlag) {
-            keyEvent.modifiers |= EVENTFLAG_ALT_DOWN;
-        }
-        
-        if ((flags & xplm_ControlFlag) == xplm_ControlFlag) {
-            keyEvent.modifiers |= EVENTFLAG_CONTROL_DOWN;
-            //keyEvent.modifiers |= EVENTFLAG_COMMAND_DOWN;
-        }
+    if ((flags & xplm_OptionAltFlag) == xplm_OptionAltFlag) {
+        keyEvent.modifiers |= EVENTFLAG_ALT_DOWN;
+    }
+    
+    if ((flags & xplm_ControlFlag) == xplm_ControlFlag) {
+        keyEvent.modifiers |= EVENTFLAG_CONTROL_DOWN;
+        //keyEvent.modifiers |= EVENTFLAG_COMMAND_DOWN;
     }
     
     handler->browserInstance->GetHost()->SendKeyEvent(keyEvent);
     
-    if (isprint(key)) {
+    if (keyEvent.type == KEYEVENT_KEYDOWN && isprint(key)) {
         CefKeyEvent textEvent;
         textEvent.type = KEYEVENT_CHAR;
-        textEvent.character = key;
-        textEvent.unmodified_character = key;
+        textEvent.character = keyEvent.character;
+        textEvent.unmodified_character = keyEvent.unmodified_character;
         textEvent.native_key_code = keyEvent.native_key_code;
-        textEvent.windows_key_code = keyEvent.windows_key_code;
+        textEvent.windows_key_code = keyEvent.character;
         
-        if (keyEvent.type == KEYEVENT_KEYDOWN) {
-            handler->browserInstance->GetHost()->SendKeyEvent(textEvent);
-        }
+        handler->browserInstance->GetHost()->SendKeyEvent(textEvent);
     }
 }
 
@@ -509,7 +504,11 @@ bool Browser::createBrowser() {
     handler = CefRefPtr<BrowserHandler>(new BrowserHandler(textureId, AppState::getInstance()->tabletDimensions.browserWidth, AppState::getInstance()->tabletDimensions.browserHeight));
     
     CefWindowInfo window_info;
+#if LIN
+    window_info.SetAsWindowless(0);
+#else
     window_info.SetAsWindowless(nullptr);
+#endif
     //window_info.shared_texture_enabled
     window_info.windowless_rendering_enabled = true;
     bool browserCreated = CefBrowserHost::CreateBrowser(window_info, handler, !pendingUrl.empty() ? pendingUrl : AppState::getInstance()->config.homepage, browser_settings, nullptr, request_context);

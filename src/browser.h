@@ -35,7 +35,7 @@ public:
     void mouseMove(float normalizedX, float normalizedY);
     bool click(XPLMMouseStatus status, float normalizedX, float normalizedY);
     void scroll(float normalizedX, float normalizedY, int clicks, bool horizontal);
-    void key(unsigned short key, XPLMKeyFlags flags = 0);
+    void key(unsigned short key, unsigned short virtualKey, XPLMKeyFlags flags = 0);
     bool goBack();
     CursorType cursor();
 };

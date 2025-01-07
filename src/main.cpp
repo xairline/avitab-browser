@@ -24,7 +24,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     switch (ul_reason_for_call)
     {
         case DLL_PROCESS_ATTACH: {
-//             TODO: See if we're able to redirect the search path for libcef.dll to X-Planes default location. See comments below.
+//             TODO: See if we're able to redirect the search path for libcef.dll to X-Planes default location. See comments below. (XP11)
 //             debug("DLL_PROCESS_ATTACH\n");
 //             wchar_t dllPath[MAX_PATH];
 //             GetModuleFileNameW(hModule, dllPath, MAX_PATH);
@@ -39,11 +39,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 //             // Set the DLL search directory
 //             // xp11: Resources/dlls/64/cef/win/bin/release/cefSimpleHelper.exe
 //             // xp11: Resources/dlls/64/cef/win/resources/locales/
-//            
-//             // xp12: Resources/dlls/64/cef/win
-//             // xp12: Resources/dlls/64/cef/win/cefclient.exe
-//             // xp12: Resources/dlls/64/cef/win/icudtl
-//             // xp12: Resources/dlls/64/cef/win/libcef.dll
 //             std::wstring dependencyPath = std::wstring(dllPath) + L"\\..\\..\\..\\dlls\\64\\cef\\win\\bin\\release";
 //             //std::wstring dependencyPath = std::wstring(dllPath) + L"\\dlls\\64\\cef\\win\\bin\\release";
 //             debug("Setting DLL directory to: %ls\n", dependencyPath.c_str());
@@ -68,6 +63,7 @@ void menuAction(void* mRef, void* iRef);
 void registerWindow();
 
 unsigned short pressedKeyCode = 0;
+unsigned short pressedVirtualKeyCode = 0;
 double pressedKeyTime = 0;
 XPLMWindowID window;
 
@@ -215,14 +211,16 @@ void menuAction(void* mRef, void* iRef) {
 void keyPressed(XPLMWindowID inWindowID, char key, XPLMKeyFlags flags, char virtualKey, void* inRefcon, int losingFocus) {
     if ((flags & xplm_DownFlag) == xplm_DownFlag) {
         pressedKeyCode = key;
+        pressedVirtualKeyCode = virtualKey;
         pressedKeyTime = XPLMGetElapsedTime();
-        AppState::getInstance()->browser->key(key, flags);
+        AppState::getInstance()->browser->key(key, virtualKey, flags);
     }
     
     if ((flags & xplm_UpFlag) == xplm_UpFlag) {
         pressedKeyCode = 0;
+        pressedVirtualKeyCode = 0;
         pressedKeyTime = 0;
-        AppState::getInstance()->browser->key(key, flags);
+        AppState::getInstance()->browser->key(key, virtualKey, flags);
     }
     
     if (losingFocus) {
@@ -314,6 +312,7 @@ int mouseCursor(XPLMWindowID inWindowID, int x, int y, void* inRefcon) {
                 setIBeamCursor();
                 break;
 #elif LIN
+            // TODO: Research. Should we set the linux cursor through X11 or Wayland perhaps?
 #elif IBM
             case CursorHand:
                 SetCursor(LoadCursor(NULL, IDC_HAND));
@@ -346,7 +345,7 @@ float update(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoo
      }
     
      if (pressedKeyTime > 0 && XPLMGetElapsedTime() > pressedKeyTime + 0.3f) {
-         AppState::getInstance()->browser->key(pressedKeyCode);
+         AppState::getInstance()->browser->key(pressedKeyCode, pressedVirtualKeyCode);
      }
     
      if (AppState::getInstance()->browser->hasInputFocus() != XPLMHasKeyboardFocus(window)) {
