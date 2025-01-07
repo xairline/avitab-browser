@@ -55,8 +55,16 @@ fi
 
 for platform in $PLATFORMS; do
     echo "Building $platform..."
-    cmake -DCMAKE_TOOLCHAIN_FILE=toolchain-$platform.cmake -DSDK_VERSION=$SDK_VERSION -Bbuild/$platform -H.
-    make -C build/$platform
+    if [ $platform = "lin" ]; then
+        # Prerequisite: Create a container based on gcc:latest with cmake and libgl1-mesa-dev, for x86_64 architecture
+        docker run --rm -v $(pwd):/src -w /src gcc-cmake-x86:latest bash -c "\
+        cmake -DCMAKE_CXX_FLAGS="-march=x86-64" -DCMAKE_TOOLCHAIN_FILE=toolchain-$platform.cmake -DSDK_VERSION=$SDK_VERSION -Bbuild/$platform -H. && \
+        make -C build/$platform"
+    else
+        cmake -DCMAKE_TOOLCHAIN_FILE=toolchain-$platform.cmake -DSDK_VERSION=$SDK_VERSION -Bbuild/$platform -H.
+        make -C build/$platform
+    fi
+
     if [ $? -eq 0 ]; then
         echo "\n\n"
         echo "\033[1;32m$platform build succeeded.\033[0m\nProduct: build/$platform/${platform}_x64/${PROJECT_NAME}.xpl"
