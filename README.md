@@ -21,15 +21,17 @@ This plugin makes use of the already present CEF (Chromium Embedded Framework) i
 ## Development Setup
 
 ### 1. XPlane SDK
-This project support [SDK 410](https://developer.x-plane.com/wp-content/plugins/code-sample-generation/sdk_zip_files/XPSDK410.zip) for XP12 and [SDK 301](https://developer.x-plane.com/wp-content/plugins/code-sample-generation/sdk_zip_files/XPSDK301.zip) for XP11. 
 
-Rename download folder and place it like this:
+This project supports [SDK 410](https://developer.x-plane.com/wp-content/plugins/code-sample-generation/sdk_zip_files/XPSDK410.zip) for XP12 and [SDK 301](https://developer.x-plane.com/wp-content/plugins/code-sample-generation/sdk_zip_files/XPSDK301.zip) for XP11.
+
+Rename the downloaded `SDK` folder to `SDK_301` or `SDK_410` and use the following folder structure:
+
 ```
-Project/
+avitab-browser/
 │
-├── README.md                   
-├── LICENSE.md                  
-├── .gitignore                
+├── README.md
+├── LICENSE.md
+├── .gitignore
 │
 ├── SDK_410       #SDK 410
 |  ├── CHeaders
@@ -42,24 +44,27 @@ Project/
 |
 .....
 ```
+
 ### 2. CEF
-a. Download CEF 117.2.5
+
+a. Download CEF `117.2.5` (This may change as X-Plane 12 updates its CEF version, we try to stay on the same version)
 
 - Windows: https://cef-builds.spotifycdn.com/index.html#windows64:117.2.5
 - Linux: https://cef-builds.spotifycdn.com/index.html#linux64:117.2.5
 - MacOS(arm): https://cef-builds.spotifycdn.com/index.html#macosarm64:117.2.5
 
 Create a lib folder and put the downloaded file like this:
+
 ```
-Project/
+avitab-browser/
 │
-├── README.md                   
-├── LICENSE.md                  
-├── .gitignore                
+├── README.md
+├── LICENSE.md
+├── .gitignore
 │
-├── SDK_410       
+├── SDK_410
 |
-├── SDK_301       
+├── SDK_301
 |
 ├── lib               #<----- lib
 |  ├── mac_x64
@@ -72,25 +77,28 @@ Project/
 |  ├── win_x64
 .....
 ```
-b. Build cef 
+
+b. Build cef
 
 `lib/mac_x64/cef/CMakeLists.txt` has instructions on how to build. you will need (on MacOS):
+
 - `Chromium Embedded Framework.framework` under `cef` folder
 - `libcef_dll_wrapper.a` copied from `cef/build/libcef_dll_wrapper/libcef_dll_wrapper.a` under `cef`
+
 ```
-Project/
+avitab-browser/
 │
-├── README.md                   
-├── LICENSE.md                  
-├── .gitignore                
+├── README.md
+├── LICENSE.md
+├── .gitignore
 │
-├── SDK_410       
+├── SDK_410
 |
-├── SDK_301       
+├── SDK_301
 |
-├── lib       
+├── lib
 |  ├── mac_x64
-|      ├── cef        
+|      ├── cef
 |         ├── cmake
 |         ├── include
 |         ├── ...
@@ -98,11 +106,23 @@ Project/
 |         ├── README.txt
 |         ├── Chromium Embedded Framework.framework    # <----------
 |         ├── libcef_dll_wrapper.a.                    # <----------
+|      ├── dist_301
+|         ├── ... all embedded XP11 files. See the download for XP11/mac_x64 ...
 |  ├── lin_x64
+|      ├── To be determined...
 |  ├── win_x64
+|      ├── cef
+|      ├── curl
+|      ├── dist_301
+|         ├── ... all embedded XP11 files. See the download for XP11/win_x64 ...
+|      ├── dist_410
+|         ├── ... all embedded XP11 files. See the download for XP12/win_x64 ...
 .....
 ```
-### 3. Compile XP plugin
+
+### 3. Compile X-Plane plugin
+
+Use Xcode or build a release version using:
 `./build_platforms.sh`
 
->NOTE: for development, you only need to setup dependencies of your OS so you can compile and test. If you are on MacOS, you may also want to change `toolchain-mac.cmake` to only include Intel or Arm build for development and quicker compile
+> NOTE: for development, you only need to setup dependencies of your OS so you can compile and test. If you are on MacOS, you may also want to change `toolchain-mac.cmake` to only include Intel or Arm build for development and quicker compilation. You could also use the xcodeproj file to build and run the plugin.
