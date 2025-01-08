@@ -59,9 +59,7 @@ void Browser::initialize() {
             
             bool didGoBack = AppState::getInstance()->browser->goBack();
             if (!didGoBack) {
-                if (AppState::getInstance()->aircraftVariant == VariantZibo738) {
-                    Dataref::getInstance()->executeCommand("laminar/B738/tab/home");
-                }
+                Dataref::getInstance()->executeCommand("laminar/B738/tab/home");
             }
         });
     }
@@ -78,9 +76,7 @@ void Browser::initialize() {
             
             bool didGoBack = AppState::getInstance()->browser->goBack();
             if (!didGoBack) {
-                if (AppState::getInstance()->aircraftVariant == VariantZibo738) {
-                    Dataref::getInstance()->executeCommand("AviTab/Home");
-                }
+                Dataref::getInstance()->executeCommand("AviTab/Home");
             }
         });
     }
@@ -201,7 +197,8 @@ void Browser::draw() {
     int y2 = y1 + tabletDimensions.height * (offsetEnd - offsetStart);
     
     glBegin(GL_QUADS);
-    glColor3f(1, 1, 1);
+    float brightness = Dataref::getInstance()->getCached<float>("avitab/brightness");
+    glColor4f(brightness, brightness, brightness, 1.0f);
     
     float u = (float)tabletDimensions.browserWidth / tabletDimensions.textureWidth;
     float v = (float)tabletDimensions.browserHeight / tabletDimensions.textureHeight;

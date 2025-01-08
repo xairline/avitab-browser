@@ -118,7 +118,7 @@ PLUGIN_API void XPluginReceiveMessage(XPLMPluginID from, long msg, void* params)
     switch (msg) {
         case XPLM_MSG_PLANE_LOADED:
             if ((intptr_t)params != 0) {
-                // It was not the user's plane that was loaded. Ignore.
+                // It was not the user's plane. Ignore.
                 return;
             }
 
@@ -131,6 +131,12 @@ PLUGIN_API void XPluginReceiveMessage(XPLMPluginID from, long msg, void* params)
             break;
             
         case XPLM_MSG_PLANE_UNLOADED:
+            if ((intptr_t)params != 0) {
+                // It was not the user's plane. Ignore.
+                return;
+            }
+            
+            Dataref::getInstance()->executeCommand("AviTab/Home");
             AppState::getInstance()->deinitialize();
             break;
             
