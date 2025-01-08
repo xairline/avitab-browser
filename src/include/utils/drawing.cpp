@@ -43,7 +43,7 @@ void Drawing::DrawRoundedRect(float x1, float y1, float x2, float y2, float radi
     glVertex2f(AbsoluteX(x1) + radius, AbsoluteY(y2) - radius);
     for (int i = 0; i <= cornerSegments; ++i) {
         float angle = (M_PI_2 * 2.0f) + i * (M_PI_2 / cornerSegments);
-        glVertex2f(AbsoluteX(x1) + radius + cos(angle) * radius, AbsoluteY(y2 )- radius - sin(angle) * radius);
+        glVertex2f(AbsoluteX(x1) + radius + cos(angle) * radius, AbsoluteY(y2) - radius - sin(angle) * radius);
     }
     glEnd();
 
@@ -72,16 +72,20 @@ void Drawing::DrawRoundedRect(float x1, float y1, float x2, float y2, float radi
     glEnd();
 
     glLineWidth(2);
-    int numPasses = radius / 2;
+    int numPasses = ceil(radius / 2.0f);
     for (int i = 0; i < numPasses; ++i) {
+        float offset = i * 2.0f + 1.0f;
+
+        // Draw lines on the left
         glBegin(GL_LINES);
-        glVertex2f(ceilf(AbsoluteX(x1)) + 1.0f + i * 2, AbsoluteY(y1) + radius);
-        glVertex2f(ceilf(AbsoluteX(x1)) + 1.0f + i * 2, AbsoluteY(y2) - radius);
+        glVertex2f(roundf(AbsoluteX(x1) + offset), AbsoluteY(y1) + radius);
+        glVertex2f(roundf(AbsoluteX(x1) + offset), AbsoluteY(y2) - radius);
         glEnd();
-        
+
+        // Draw lines on the right
         glBegin(GL_LINES);
-        glVertex2f(floorf(AbsoluteX(x2)) - 1.0f - i * 2, AbsoluteY(y2) - radius);
-        glVertex2f(floorf(AbsoluteX(x2)) - 1.0f - i * 2, AbsoluteY(y1) + radius);
+        glVertex2f(roundf(AbsoluteX(x2) - offset), AbsoluteY(y2) - radius);
+        glVertex2f(roundf(AbsoluteX(x2) - offset), AbsoluteY(y1) + radius);
         glEnd();
     }
 }
