@@ -46,6 +46,7 @@ void BrowserHandler::destroy() {
 void BrowserHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
     browserInstance = browser;
     browserInstance->GetHost()->SetAudioMuted(AppState::getInstance()->config.audio_muted);
+    browserInstance->GetHost()->ShowDevTools(CefWindowInfo(),nullptr,CefBrowserSettings(), CefPoint());
 }
 
 bool BrowserHandler::DoClose(CefRefPtr<CefBrowser> browser) {
