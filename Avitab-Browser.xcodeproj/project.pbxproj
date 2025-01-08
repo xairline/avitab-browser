@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		124BB7E02D2E3187005D3B7B /* host_func_handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 124BB7DF2D2E3187005D3B7B /* host_func_handler.cpp */; };
-		124BB7E12D2E3187005D3B7B /* host_func_handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 124BB7DF2D2E3187005D3B7B /* host_func_handler.cpp */; };
+		124BB7E42D2EE34F005D3B7B /* xplm_v8_handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 124BB7E32D2EE34C005D3B7B /* xplm_v8_handler.cpp */; };
+		124BB7E52D2EE34F005D3B7B /* xplm_v8_handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 124BB7E32D2EE34C005D3B7B /* xplm_v8_handler.cpp */; };
 		F61F8B1C2D04549800E63C3F /* browser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F66F916C2D0333A400F84283 /* browser.cpp */; };
 		F61F8B1D2D04549C00E63C3F /* statusbar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F66D0E012D039EC400E5E93D /* statusbar.cpp */; };
 		F61F8B1E2D0456D700E63C3F /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F66F91662D0332F600F84283 /* main.cpp */; };
@@ -70,8 +70,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		124BB7DB2D2E2DBC005D3B7B /* host_func_handler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = host_func_handler.h; sourceTree = "<group>"; };
-		124BB7DF2D2E3187005D3B7B /* host_func_handler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = host_func_handler.cpp; sourceTree = "<group>"; };
+		124BB7E22D2EE26E005D3B7B /* xplm_v8_handler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xplm_v8_handler.h; sourceTree = "<group>"; };
+		124BB7E32D2EE34C005D3B7B /* xplm_v8_handler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = xplm_v8_handler.cpp; sourceTree = "<group>"; };
 		D607B19909A556E400699BC3 /* avitab-browser.xpl */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "avitab-browser.xpl"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F61F8B252D059ED500E63C3F /* button.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = button.h; sourceTree = "<group>"; };
 		F61F8B262D059ED500E63C3F /* button.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = button.cpp; sourceTree = "<group>"; };
@@ -246,8 +246,8 @@
 		F6602C0C2D0C8B2B00204B65 /* browser */ = {
 			isa = PBXGroup;
 			children = (
-				124BB7DF2D2E3187005D3B7B /* host_func_handler.cpp */,
-				124BB7DB2D2E2DBC005D3B7B /* host_func_handler.h */,
+				124BB7E22D2EE26E005D3B7B /* xplm_v8_handler.h */,
+				124BB7E32D2EE34C005D3B7B /* xplm_v8_handler.cpp */,
 				F6602C0A2D0C8B2B00204B65 /* browser_handler.h */,
 				F6602C0B2D0C8B2B00204B65 /* browser_handler.cpp */,
 			);
@@ -401,10 +401,10 @@
 				F63C14272D12C63E00932475 /* ini.c in Sources */,
 				F6602C0F2D0C8B2B00204B65 /* browser_handler.cpp in Sources */,
 				F63C14302D12CB7B00932475 /* lodepng.cpp in Sources */,
-				124BB7E12D2E3187005D3B7B /* host_func_handler.cpp in Sources */,
 				F6AF9ECC2D078ED400530297 /* appstate.cpp in Sources */,
 				F6AF9EC12D06F84900530297 /* dataref.cpp in Sources */,
 				F61F8B1C2D04549800E63C3F /* browser.cpp in Sources */,
+				124BB7E52D2EE34F005D3B7B /* xplm_v8_handler.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -424,10 +424,10 @@
 				F64CFE672D2C31E8009BE82B /* ini.c in Sources */,
 				F64CFE682D2C31E8009BE82B /* browser_handler.cpp in Sources */,
 				F64CFE692D2C31E8009BE82B /* lodepng.cpp in Sources */,
-				124BB7E02D2E3187005D3B7B /* host_func_handler.cpp in Sources */,
 				F64CFE6A2D2C31E8009BE82B /* appstate.cpp in Sources */,
 				F64CFE6B2D2C31E8009BE82B /* dataref.cpp in Sources */,
 				F64CFE6C2D2C31E8009BE82B /* browser.cpp in Sources */,
+				124BB7E42D2EE34F005D3B7B /* xplm_v8_handler.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

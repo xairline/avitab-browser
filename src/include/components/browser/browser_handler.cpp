@@ -230,3 +230,4 @@ void BrowserHandler::OnDownloadUpdated(CefRefPtr<CefBrowser> browser, CefRefPtr<
         AppState::getInstance()->statusbar->setNotice("Downloading... " + std::to_string(percentComplete) + "%");
     }
 }
+

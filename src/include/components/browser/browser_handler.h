@@ -4,6 +4,7 @@
 #include <include/cef_client.h>
 #include <include/cef_version.h>
 
+
 enum CursorType: unsigned char {
     CursorDefault = 0,
     CursorHand,
@@ -36,6 +37,7 @@ public:
     CefRefPtr<CefPermissionHandler> GetPermissionHandler() override { return this; }
     CefRefPtr<CefRequestHandler> GetRequestHandler() override { return this; }
     CefRefPtr<CefDownloadHandler> GetDownloadHandler() override { return this; }
+    
     
     void OnAfterCreated(CefRefPtr<CefBrowser> browser) override;
     bool DoClose(CefRefPtr<CefBrowser> browser) override;
