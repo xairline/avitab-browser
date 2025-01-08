@@ -24,6 +24,7 @@ struct AppConfiguration {
     std::string homepage;
     bool audio_muted;
     unsigned short minimum_width;
+    unsigned char scroll_speed;
     std::string forced_language;
     unsigned char framerate;
     struct StatusBarIcon {

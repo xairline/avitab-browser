@@ -7,7 +7,6 @@
 #include "config.h"
 #include "dataref.h"
 #include "json.hpp"
-
 #include <iostream>
 #include <regex>
 #include "json.hpp"
@@ -291,6 +290,9 @@ audio_muted=false
 # The height is adjusted proportionally to maintain the aspect ratio.
 # Note: Setting a minimum width scales the browser, which may reduce quality. 
 minimum_width=
+# scroll_speed: The speed/steps in which the browser scrolls.
+# The default value is 5. Increase to scroll faster.
+scroll_speed=
 # forced_language: The language code for the application.
 # Valid values: en-US, en-GB, nl-NL, fr-FR, etc.
 # Leave empty for default language.
@@ -336,6 +338,7 @@ url_5=
     config.homepage = reader.Get("browser", "homepage", "https://www.google.com");
     config.audio_muted = reader.GetBoolean("browser", "audio_muted", false);
     config.minimum_width = reader.GetInteger("browser", "minimum_width", 0);
+    config.scroll_speed = reader.GetInteger("browser", "scroll_speed", 5);
     config.forced_language = reader.Get("browser", "forced_language", "");
     config.framerate = reader.GetInteger("browser", "framerate", 25);
     config.statusbarIcons.clear();

@@ -6,6 +6,7 @@
 #include "appstate.h"
 #include "dataref.h"
 #include "path.h"
+#include <algorithm>
 #include <XPLMDisplay.h>
 #include <XPLMPlugin.h>
 #include <XPLMMenus.h>
@@ -281,7 +282,7 @@ int mouseWheel(XPLMWindowID inWindowID, int x, int y, int wheel, int clicks, voi
     }
     
     bool horizontal = wheel == 1;
-    AppState::getInstance()->browser->scroll(mouseX, mouseY, clicks * 3, horizontal);
+    AppState::getInstance()->browser->scroll(mouseX, mouseY, clicks * AppState::getInstance()->config.scroll_speed, horizontal);
     return 1;
 }
 
