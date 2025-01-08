@@ -45,7 +45,7 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
-      customWorkingDirectory = "/Users/ramon/X-Plane 12"
+      customWorkingDirectory = "/Users/dzou/X-Plane 12"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
@@ -56,7 +56,7 @@
       <PathRunnable
          runnableDebuggingMode = "0"
          BundleIdentifier = "com.laminar-research.X-Plane"
-         FilePath = "/Users/ramon/X-Plane 12/X-Plane.app">
+         FilePath = "/Users/dzou/X-Plane 12/X-Plane.app">
       </PathRunnable>
    </LaunchAction>
    <ProfileAction
