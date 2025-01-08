@@ -62,8 +62,8 @@ float update(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoo
 void menuAction(void* mRef, void* iRef);
 void registerWindow();
 
-unsigned short pressedKeyCode = 0;
-unsigned short pressedVirtualKeyCode = 0;
+unsigned char pressedKeyCode = 0;
+unsigned char pressedVirtualKeyCode = 0;
 double pressedKeyTime = 0;
 XPLMWindowID window;
 
@@ -235,6 +235,9 @@ int mouseClicked(XPLMWindowID inWindowID, int x, int y, XPLMMouseStatus status, 
     
     float mouseX, mouseY;
     if (!Dataref::getInstance()->getMouse(&mouseX, &mouseY, x, y)) {
+        if (AppState::getInstance()->browserVisible && AppState::getInstance()->browser->hasInputFocus()) {
+            AppState::getInstance()->browser->setFocus(false);
+        }
         return 0;
     }
     
@@ -257,6 +260,7 @@ int mouseClicked(XPLMWindowID inWindowID, int x, int y, XPLMMouseStatus status, 
          return 1;
      }
     
+    AppState::getInstance()->browser->setFocus(false);
     return 0;
 }
 
@@ -344,9 +348,11 @@ float update(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoo
          return REFRESH_INTERVAL_SECONDS_FAST;
      }
     
+#ifndef DEBUG
      if (pressedKeyTime > 0 && XPLMGetElapsedTime() > pressedKeyTime + 0.3f) {
          AppState::getInstance()->browser->key(pressedKeyCode, pressedVirtualKeyCode);
      }
+#endif
     
      if (AppState::getInstance()->browser->hasInputFocus() != XPLMHasKeyboardFocus(window)) {
          if (AppState::getInstance()->browser->hasInputFocus()) {

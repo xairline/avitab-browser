@@ -4,7 +4,6 @@
 #include "appstate.h"
 #include "dataref.h"
 #include "browser_handler.h"
-#include "keycodes.h"
 #include "drawing.h"
 #include <iomanip>
 #include <sstream>
@@ -28,6 +27,7 @@
 #include <XPLMDisplay.h>
 
 #if APL
+#include "mac_keycodes.h"
 #include <include/wrapper/cef_library_loader.h>
 #endif
 
@@ -296,14 +296,18 @@ bool Browser::hasInputFocus() {
 }
 
 void Browser::setFocus(bool focus) {
-    if (!textureId || !handler) {
+    if (!textureId || !handler || !handler->browserInstance) {
         return;
     }
     
     handler->browserInstance->GetHost()->SetFocus(focus);
+    if (!focus && handler->hasInputFocus) {
+        std::string script = "document.activeElement?.blur();";
+        handler->browserInstance->GetMainFrame()->ExecuteJavaScript(script, "about:blank", 0);
+    }
 }
 
-void Browser::key(unsigned short key, unsigned short virtualKey, XPLMKeyFlags flags) {
+void Browser::key(unsigned char key, unsigned char virtualKey, XPLMKeyFlags flags) {
     if (!textureId || !handler) {
         return;
     }
@@ -319,12 +323,13 @@ void Browser::key(unsigned short key, unsigned short virtualKey, XPLMKeyFlags fl
     keyEvent.character = utf16Character;
     keyEvent.unmodified_character = keyEvent.character;
 #elif APL
-    auto it = KeyCodes::table.find(virtualKey);
-    if (it != KeyCodes::table.end()) {
+    auto it = winVkToMacNative.find(virtualKey);
+    if (it != winVkToMacNative.end()) {
         int keyCode = it->second;
         keyEvent.native_key_code = keyCode;
     }
     else {
+        debug("Unknown key: 0x%02X VK: 0x%02X\n", key, virtualKey);
         keyEvent.native_key_code = key;
     }
     keyEvent.windows_key_code = virtualKey;

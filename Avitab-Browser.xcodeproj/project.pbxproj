@@ -89,7 +89,7 @@
 		F64EE9C02D24130F000E68D2 /* drawing.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = drawing.cpp; sourceTree = "<group>"; };
 		F6602C0A2D0C8B2B00204B65 /* browser_handler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = browser_handler.h; sourceTree = "<group>"; };
 		F6602C0B2D0C8B2B00204B65 /* browser_handler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = browser_handler.cpp; sourceTree = "<group>"; };
-		F6602C172D0E04BB00204B65 /* keycodes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = keycodes.h; sourceTree = "<group>"; };
+		F6602C172D0E04BB00204B65 /* mac_keycodes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mac_keycodes.h; sourceTree = "<group>"; };
 		F66D0E002D039EC400E5E93D /* statusbar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = statusbar.h; sourceTree = "<group>"; };
 		F66D0E012D039EC400E5E93D /* statusbar.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = statusbar.cpp; sourceTree = "<group>"; };
 		F66F91662D0332F600F84283 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
@@ -184,7 +184,7 @@
 				F63C142C2D12CB7B00932475 /* lodepng */,
 				F63C142F2D12CB7B00932475 /* nanosvg */,
 				F63C14232D12C63E00932475 /* ini */,
-				F6602C172D0E04BB00204B65 /* keycodes.h */,
+				F6602C172D0E04BB00204B65 /* mac_keycodes.h */,
 			);
 			path = lib;
 			sourceTree = "<group>";
