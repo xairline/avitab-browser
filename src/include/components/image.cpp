@@ -11,7 +11,7 @@
 #define NANOSVGRAST_IMPLEMENTATION
 #include "nanosvgrast.h"
 
-Image::Image(std::string filename) {
+Image::Image(std::string filename,unsigned int width, unsigned int height) {
     x = 0;
     y = 0;
     rotationDegrees = 0;
@@ -32,8 +32,8 @@ Image::Image(std::string filename) {
         else if (filename.ends_with(".svg") || filename.ends_with(".svg")) {
             NSVGimage *image = nsvgParseFromFile(filename.c_str(), "px", 96);
             struct NSVGrasterizer *rast = nsvgCreateRasterizer();
-            pixelsWidth = 16;
-            pixelsHeight = 16;
+            pixelsWidth = width;
+            pixelsHeight = height;
             data = (unsigned char *)malloc(pixelsWidth * pixelsHeight * 4);
             nsvgRasterize(rast, image, 0, 0, (float)pixelsWidth / image->width, data, pixelsWidth, pixelsHeight, pixelsWidth * 4);
             for (int i = 0; i < pixelsWidth * pixelsHeight * 4; i++) {

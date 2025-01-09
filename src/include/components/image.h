@@ -19,7 +19,7 @@ public:
     unsigned int pixelsWidth;
     unsigned int pixelsHeight;
     
-    Image(std::string filename);
+    Image(std::string filename,unsigned int width = 16, unsigned int height = 16);
     void destroy();
     void draw(unsigned short rotationDegrees);
     virtual void draw();

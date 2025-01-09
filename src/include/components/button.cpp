@@ -1,9 +1,9 @@
 #include "button.h"
 #include "appstate.h"
 #include "config.h"
+#include <XPLMDisplay.h>
 #include <XPLMGraphics.h>
 #include <XPLMUtilities.h>
-#include <XPLMDisplay.h>
 
 Button::Button(float aWidth, float aHeight) : Image("") {
     callback = nullptr;
@@ -14,7 +14,8 @@ Button::Button(float aWidth, float aHeight) : Image("") {
     AppState::getInstance()->registerButton(this);
 }
 
-Button::Button(std::string filename) : Image(filename) {
+Button::Button(std::string filename, unsigned int width, unsigned int height)
+    : Image(filename, width, height) {
     AppState::getInstance()->registerButton(this);
 }
 
@@ -23,16 +24,19 @@ void Button::destroy() {
     Image::destroy();
 }
 
-bool Button::handleState(float normalizedX, float normalizedY, ButtonState state) {
+bool Button::handleState(float normalizedX, float normalizedY,
+                         ButtonState state) {
     if (opacity < __FLT_EPSILON__) {
         return false;
     }
-    
-    float mouseX = AppState::getInstance()->tabletDimensions.width * normalizedX;
+
+    float mouseX =
+        AppState::getInstance()->tabletDimensions.width * normalizedX;
     float halfWidth = pixelsWidth / 2.0f;
-    
+
     if (mouseX >= (x - halfWidth) && mouseX <= (x + halfWidth)) {
-        float mouseY = AppState::getInstance()->tabletDimensions.height * normalizedY;
+        float mouseY =
+            AppState::getInstance()->tabletDimensions.height * normalizedY;
         float halfHeight = pixelsHeight / 2.0f;
         if (mouseY >= (y - halfHeight) && mouseY <= (y + halfHeight)) {
             if (state == kButtonClick) {
@@ -40,14 +44,12 @@ bool Button::handleState(float normalizedX, float normalizedY, ButtonState state
                     callback();
                 }
             }
-            
+
             return true;
         }
     }
-    
+
     return false;
 }
 
-void Button::setClickHandler(ButtonClickHandlerFunc cb) {
-    callback = cb;
-}
+void Button::setClickHandler(ButtonClickHandlerFunc cb) { callback = cb; }

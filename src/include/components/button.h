@@ -1,27 +1,25 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
-#include <string>
-#include <functional>
 #include "image.h"
+#include <functional>
+#include <string>
 
-enum ButtonState {
-    kButtonHover = 1,
-    kButtonClick = 2
-};
+enum ButtonState { kButtonHover = 1, kButtonClick = 2 };
 
 typedef std::function<void()> ButtonClickHandlerFunc;
 
 class Button : public Image {
-private:
+  private:
     ButtonClickHandlerFunc callback;
-    
-public:
+
+  public:
     Button(float relativeWidth, float relativeHeight);
-    Button(std::string filename);
+    Button(std::string filename, unsigned int width = 16,
+           unsigned int height = 16);
     void destroy();
     bool handleState(float normalizedX, float normalizedY, ButtonState state);
-    
+
     void setClickHandler(ButtonClickHandlerFunc callback);
 };
 

@@ -15,6 +15,7 @@ private:
     float offsetEnd;
     float lastGpsUpdateTime;
     Button *backButton;
+    Button *refreshButton;
     CefRefPtr<BrowserHandler> handler;
     std::string pendingUrl;
     bool createBrowser();
@@ -37,6 +38,7 @@ public:
     void scroll(float normalizedX, float normalizedY, int clicks, bool horizontal);
     void key(unsigned char key, unsigned char virtualKey, XPLMKeyFlags flags = 0);
     bool goBack();
+    void refresh();
     CursorType cursor();
 };
 
