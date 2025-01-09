@@ -28,6 +28,29 @@ BrowserHandler::BrowserHandler(int aTextureId, unsigned short aWidth, unsigned s
     cursorState = CursorDefault;
     hasInputFocus = false;
     browserInstance = nullptr;
+    CefMessageRouterConfig config;
+    message_router_ = CefMessageRouterBrowserSide::Create(config);
+    message_router_->AddHandler(this, false);
+}
+
+bool BrowserHandler::OnQuery( CefRefPtr<CefBrowser> browser,
+                             CefRefPtr<CefFrame> frame,
+                             int64_t query_id,
+                             const CefString& request,
+                             bool persistent,
+                             CefRefPtr<Callback> callback){
+    XPLMDebugString("------- hey ehey -------");
+    if (request == "myFunction") {
+        // Perform your host function
+        std::string result = "Hello from C++!";
+        callback->Success(result);
+        return true;
+    }
+    return false;
+}
+
+bool BrowserHandler::OnProcessMessageReceived( CefRefPtr< CefBrowser > browser, CefRefPtr< CefFrame > frame, CefProcessId source_process, CefRefPtr< CefProcessMessage > message ) {
+    return message_router_->OnProcessMessageReceived(browser, frame, source_process, message);
 }
 
 BrowserHandler::~BrowserHandler() {
