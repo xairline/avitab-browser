@@ -1,7 +1,7 @@
-#ifndef KEYCODES_H
-#define KEYCODES_H
+#ifndef UNIX_KEYCODES_H
+#define UNIX_KEYCODES_H
 
-static std::unordered_map<unsigned char, unsigned short> winVkToMacNative = {
+static std::unordered_map<unsigned char, unsigned short> virtualKeycodeToUnixKeycode = {
     {0x08, 0x33}, // Backspace
     {0x09, 0x30}, // Tab
     {0x0D, 0x24}, // Enter

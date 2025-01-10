@@ -95,8 +95,9 @@ for platform in $AVAILABLE_PLATFORMS; do
 done
 
 cp -r assets build/dist
-default_ini=$(sed -n '/const char \*defaultConfig = R"(/,/^)";/p' "./src/include/appstate.cpp" | sed '$d' | sed '1s/const char \*defaultConfig = R"(//' | sed 's/^[ \t]*//')
-echo "$default_ini" > build/dist/config.ini
+# Don't copy the default .ini file, will be created by the plugin on first run
+# default_ini=$(sed -n '/const char \*defaultConfig = R"(/,/^)";/p' "./src/include/appstate.cpp" | sed '$d' | sed '1s/const char \*defaultConfig = R"(//' | sed 's/^[ \t]*//')
+# echo "$default_ini" > build/dist/config.ini
 
 cd build
 mv dist $PROJECT_NAME

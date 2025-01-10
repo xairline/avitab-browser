@@ -230,3 +230,36 @@ void BrowserHandler::OnDownloadUpdated(CefRefPtr<CefBrowser> browser, CefRefPtr<
         AppState::getInstance()->statusbar->setNotice("Downloading... " + std::to_string(percentComplete) + "%");
     }
 }
+
+cef_return_value_t BrowserHandler::OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefCallback> callback) {
+    CefRequest::HeaderMap headers;
+    request->GetHeaderMap(headers);
+    auto it = headers.find("User-Agent");
+    if (it == headers.end()) {
+        return RV_CONTINUE;
+    }
+
+    // Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) X-Plane Safari/537.36
+    std::string userAgent = it->second.ToString();
+    
+    if (AppState::getInstance()->config.user_agent.empty()) {
+        size_t start = userAgent.find("X-Plane");
+        if (start != std::string::npos) {
+            size_t end = userAgent.find(" ", start);
+            if (end == std::string::npos) {
+                end = userAgent.length();
+            }
+            
+            userAgent.replace(start, end - start, "Chrome/117.2.5.0");
+        }
+    }
+    else {
+        userAgent = AppState::getInstance()->config.user_agent;
+    }
+    
+    headers.erase("User-Agent");
+    headers.insert(std::make_pair("User-Agent", userAgent));
+    request->SetHeaderMap(headers);
+    
+    return RV_CONTINUE;
+}

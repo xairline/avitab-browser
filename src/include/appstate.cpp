@@ -297,6 +297,9 @@ scroll_speed=
 # Valid values: en-US, en-GB, nl-NL, fr-FR, etc.
 # Leave empty for default language.
 forced_language=
+# user_agent: The User-Agent header for the browser
+# Leave empty for the default Chrome UA.
+user_agent=
 # framerate: The number of frames per second to render the browser. Saves CPU if set to a lower value.
 # The browser will still sleep / idle when able or not visible.
 # Leave empty for default framerate.
@@ -340,6 +343,7 @@ url_5=
     config.minimum_width = reader.GetInteger("browser", "minimum_width", 0);
     config.scroll_speed = reader.GetInteger("browser", "scroll_speed", 5);
     config.forced_language = reader.Get("browser", "forced_language", "");
+    config.user_agent = reader.Get("browser", "user_agent", "");
     config.framerate = reader.GetInteger("browser", "framerate", 25);
     config.statusbarIcons.clear();
     for (int i = 1; i <= 5; ++i) {
@@ -410,7 +414,7 @@ bool AppState::loadAvitabConfig() {
         0,0
     };
     
-#ifdef AVITAB_USE_FIXED_ASPECT_RATIO
+#if AVITAB_USE_FIXED_ASPECT_RATIO
     float aspectHeight = (float)tabletDimensions.width * aspectRatio;
     tabletDimensions.y += (tabletDimensions.height - aspectHeight) / 2.0f;
     tabletDimensions.height = aspectHeight;

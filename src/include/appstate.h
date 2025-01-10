@@ -26,6 +26,7 @@ struct AppConfiguration {
     unsigned short minimum_width;
     unsigned char scroll_speed;
     std::string forced_language;
+    std::string user_agent;
     unsigned char framerate;
     struct StatusBarIcon {
         std::string icon;

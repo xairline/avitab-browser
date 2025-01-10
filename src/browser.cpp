@@ -27,8 +27,10 @@
 #include <XPLMDisplay.h>
 
 #if APL
-#include "mac_keycodes.h"
+#include "unix_keycodes.h"
 #include <include/wrapper/cef_library_loader.h>
+#elif LIN
+#include "unix_keycodes.h"
 #endif
 
 Browser::Browser() {
@@ -319,9 +321,9 @@ void Browser::key(unsigned char key, unsigned char virtualKey, XPLMKeyFlags flag
     keyEvent.native_key_code = MapVirtualKey(virtualKey, MAPVK_VK_TO_VSC);
     keyEvent.character = utf16Character;
     keyEvent.unmodified_character = keyEvent.character;
-#elif APL
-    auto it = winVkToMacNative.find(virtualKey);
-    if (it != winVkToMacNative.end()) {
+#else
+    auto it = virtualKeycodeToUnixKeycode.find(virtualKey);
+    if (it != virtualKeycodeToUnixKeycode.end()) {
         int keyCode = it->second;
         keyEvent.native_key_code = keyCode;
     }

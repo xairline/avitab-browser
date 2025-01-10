@@ -14,10 +14,7 @@
 #include <XPLMMenus.h>
 #include <cmath>
 #include "drawing.h"
-
-#if APL
 #include "cursor.h"
-#endif
 
 #if IBM
 #include <windows.h>
@@ -87,6 +84,9 @@ PLUGIN_API int XPluginStart(char * name, char * sig, char * desc)
     XPluginReceiveMessage(0, XPLM_MSG_PLANE_LOADED, nullptr);
     
     debug("Plugin started (version %s)\n", VERSION);
+    
+    initializeCursor();
+    
     return 1;
 }
 
@@ -95,6 +95,8 @@ PLUGIN_API void XPluginStop(void) {
     XPLMUnregisterFlightLoopCallback(update, nullptr);
     XPLMDestroyWindow(window);
     window = nullptr;
+    
+    destroyCursor();
     
     AppState::getInstance()->deinitialize();
     debug("Plugin stopped\n");
@@ -313,29 +315,7 @@ int mouseCursor(XPLMWindowID inWindowID, int x, int y, void* inRefcon) {
     
     if (wantedCursor != AppState::getInstance()->activeCursor) {
         AppState::getInstance()->activeCursor = wantedCursor;
-        switch (wantedCursor) {
-#if APL
-            case CursorHand:
-                setPointingHandCursor();
-                break;
-                
-            case CursorText:
-                setIBeamCursor();
-                break;
-#elif LIN
-            // TODO: Research. Should we set the linux cursor through X11 or Wayland perhaps?
-#elif IBM
-            case CursorHand:
-                SetCursor(LoadCursor(NULL, IDC_HAND));
-                break;
-                
-            case CursorText:
-                SetCursor(LoadCursor(NULL, IDC_IBEAM));
-                break;
-#endif
-            default:
-                break;
-        }
+        setCursor(wantedCursor);
     }
     
     return xplm_CursorCustom;

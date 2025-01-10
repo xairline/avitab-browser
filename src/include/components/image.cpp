@@ -4,8 +4,6 @@
 #include <fstream>
 #include <XPLMGraphics.h>
 #include <XPLMUtilities.h>
-
-#define LODEPNG_COMPILE_CPP 0
 #include "lodepng.h"
 #define NANOSVG_IMPLEMENTATION
 #define NANOSVGRAST_IMPLEMENTATION

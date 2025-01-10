@@ -3,14 +3,9 @@
 
 #include <include/cef_client.h>
 #include <include/cef_version.h>
+#include "cursor.h"
 
-enum CursorType: unsigned char {
-    CursorDefault = 0,
-    CursorHand,
-    CursorText
-};
-
-class BrowserHandler : public CefClient, public CefPermissionHandler, public CefRenderHandler, public CefDisplayHandler, public CefLifeSpanHandler, public CefLoadHandler, public CefDialogHandler, public CefJSDialogHandler, public CefFocusHandler, public CefRequestHandler, public CefDownloadHandler {
+class BrowserHandler : public CefClient, public CefPermissionHandler, public CefRenderHandler, public CefDisplayHandler, public CefLifeSpanHandler, public CefLoadHandler, public CefDialogHandler, public CefJSDialogHandler, public CefFocusHandler, public CefRequestHandler, public CefDownloadHandler, public CefResourceRequestHandler {
 private:
     IMPLEMENT_REFCOUNTING(BrowserHandler);
     int textureId;
@@ -36,6 +31,7 @@ public:
     CefRefPtr<CefPermissionHandler> GetPermissionHandler() override { return this; }
     CefRefPtr<CefRequestHandler> GetRequestHandler() override { return this; }
     CefRefPtr<CefDownloadHandler> GetDownloadHandler() override { return this; }
+    CefRefPtr<CefResourceRequestHandler> GetResourceRequestHandler(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool is_navigation, bool is_download, const CefString &request_initiator, bool &disable_default_handling) override { return this; }
     
     void OnAfterCreated(CefRefPtr<CefBrowser> browser) override;
     bool DoClose(CefRefPtr<CefBrowser> browser) override;
@@ -55,6 +51,7 @@ public:
     void OnDocumentAvailableInMainFrame(CefRefPtr<CefBrowser> browser) override;
     void OnBeforeDownload(CefRefPtr<CefBrowser> browser, CefRefPtr<CefDownloadItem> download_item, const CefString &suggested_name, CefRefPtr<CefBeforeDownloadCallback> callback) override;
     void OnDownloadUpdated(CefRefPtr<CefBrowser> browser, CefRefPtr<CefDownloadItem> download_item, CefRefPtr<CefDownloadItemCallback> callback) override;
+    cef_return_value_t OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefCallback> callback) override;
 };
 
 #endif
