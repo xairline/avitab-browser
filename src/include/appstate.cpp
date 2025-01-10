@@ -199,16 +199,20 @@ void AppState::update() {
     );
 }
 
-void AppState::draw() {
+void AppState::draw(XPLMWindowID windowId) {
     if (!pluginInitialized || !hasPower) {
         return;
     }
     
-    mainMenuButton->draw();
-    statusbar->draw();
+    // only draw mainMenuButton and statusBar in avitab mode
+    // if we are given a windowId here, it means we are using standalone mode
+    if (windowId == nullptr) {
+        mainMenuButton->draw();
+        statusbar->draw();
+    }
     
     if (browserVisible || shouldBrowserVisible) {
-        browser->draw();
+        browser->draw(windowId);
     }
     
     if (notification) {

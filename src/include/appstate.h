@@ -79,7 +79,7 @@ public:
     void checkLatestVersion();
     
     void update();
-    void draw();
+    void draw(XPLMWindowID windowId);
     
     bool updateButtons(float normalizedX, float normalizedY, ButtonState state);
     void registerButton(Button *button);

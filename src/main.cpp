@@ -76,6 +76,9 @@ PLUGIN_API int XPluginStart(char * name, char * sig, char * desc)
     int item = XPLMAppendMenuItem(XPLMFindPluginsMenu(), FRIENDLY_NAME, nullptr, 1);
     XPLMMenuID id = XPLMCreateMenu(FRIENDLY_NAME, XPLMFindPluginsMenu(), item, menuAction, nullptr);
     XPLMAppendMenuItem(id, "Reload configuration", (void *)"ActionReloadConfig", 0);
+    XPLMAppendMenuSeparator(id);
+    XPLMAppendMenuItem(id, "Standalone", (void *)"ActionStandalone", 0);
+    XPLMAppendMenuSeparator(id);
     XPLMAppendMenuItem(id, "About", (void *)"ActionAbout", 0);
 
     XPLMRegisterFlightLoopCallback(update, REFRESH_INTERVAL_SECONDS_SLOW, nullptr);
@@ -91,7 +94,7 @@ PLUGIN_API int XPluginStart(char * name, char * sig, char * desc)
 }
 
 PLUGIN_API void XPluginStop(void) {
-    XPLMUnregisterDrawCallback(draw, xplm_Phase_Gauges, 0, nullptr);
+//    XPLMUnregisterDrawCallback(draw, xplm_Phase_Gauges, 0, nullptr);
     XPLMUnregisterFlightLoopCallback(update, nullptr);
     XPLMDestroyWindow(window);
     window = nullptr;
@@ -145,75 +148,6 @@ PLUGIN_API void XPluginReceiveMessage(XPLMPluginID from, long msg, void* params)
             
         default:
             break;
-    }
-}
-
-void menuAction(void* mRef, void* iRef) {
-    if (!strcmp((char *)iRef, "ActionAbout")) {
-        int winLeft, winTop, winRight, winBot;
-        XPLMGetScreenBoundsGlobal(&winLeft, &winTop, &winRight, &winBot);
-        XPLMCreateWindow_t params;
-        float screenWidth = fabs(winLeft - winRight);
-        float screenHeight = fabs(winTop - winBot);
-        float width = 450.0f;
-        float height = 180.0f;
-
-        // Calculate centered position for the window
-        params.structSize = sizeof(params);
-        params.left = (int)(winLeft + (screenWidth - width) / 2);
-        params.right = params.left + width;
-        params.top = (int)(winTop - (screenHeight - height) / 2);
-        params.bottom = params.top - height;
-        params.visible = 1;
-        params.refcon = nullptr;
-        params.drawWindowFunc = [](XPLMWindowID inWindowID, void *drawingRef){
-            XPLMSetGraphicsState(
-                                 0, // No fog, equivalent to glDisable(GL_FOG);
-                                 0, // One texture, equivalent to glEnable(GL_TEXTURE_2D);
-                                 0, // No lighting, equivalent to glDisable(GL_LIGHT0);
-                                 0, // No alpha testing, e.g glDisable(GL_ALPHA_TEST);
-                                 1, // Use alpha blending, e.g. glEnable(GL_BLEND);
-                                 0, // No depth read, e.g. glDisable(GL_DEPTH_TEST);
-                                 0 // No depth write, e.g. glDepthMask(GL_FALSE);
-            );
-            glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-            
-            int left, top, right, bottom;
-            XPLMGetWindowGeometry(inWindowID, &left, &top, &right, &bottom);
-            float color[] = {1.0f, 1.0f, 1.0f};
-            
-            float x = left + 16.0f;
-            float y = top - 16.0f;
-            XPLMDrawString(color, x, y, FRIENDLY_NAME, nullptr, xplmFont_Proportional);
-            y -= 16.0f;
-            XPLMDrawString(color, x, y, "Version " VERSION, nullptr, xplmFont_Proportional);
-            y -= 32.0f;
-            XPLMDrawString(color, x, y, "This software is licensed under the GNU General Public License, GPL-3.0", nullptr, xplmFont_Proportional);
-            y -= 32.0f;
-            XPLMDrawString(color, x, y, "For updates to " FRIENDLY_NAME ", please see the forums at x-plane.org", nullptr, xplmFont_Proportional);
-            y -= 16.0f;
-            XPLMDrawString(color, x, y, "or checkout the GitHub releases at github.com/rswilem/avitab-browser.", nullptr, xplmFont_Proportional);
-            y -= 16.0f;
-            XPLMDrawString(color, x, y, "Made with love by TheRamon, thank you for using this software!", nullptr, xplmFont_Proportional);
-        };
-        params.handleMouseClickFunc = nullptr;
-        params.handleRightClickFunc = nullptr;
-        params.handleMouseWheelFunc = nullptr;
-        params.handleKeyFunc = nullptr;
-        params.handleCursorFunc = nullptr;
-        params.layer = xplm_WindowLayerFloatingWindows;
-        params.decorateAsFloatingWindow = xplm_WindowDecorationRoundRectangle;
-        XPLMWindowID aboutWindow = XPLMCreateWindowEx(&params);
-        XPLMSetWindowTitle(aboutWindow, FRIENDLY_NAME);
-        XPLMSetWindowPositioningMode(aboutWindow, xplm_WindowPositionFree, -1);
-        XPLMBringWindowToFront(aboutWindow);
-    }
-    else if (!strcmp((char *)iRef, "ActionReloadConfig")) {
-        AppState::getInstance()->loadConfig();
-        
-        if (window) {
-            XPLMBringWindowToFront(window);
-        }
     }
 }
 
@@ -362,7 +296,7 @@ float update(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoo
 }
 
 int draw(XPLMDrawingPhase inPhase, int inIsBefore, void * inRefcon) {
-    AppState::getInstance()->draw();
+    AppState::getInstance()->draw(nullptr);
     return 1;
 }
 
@@ -392,3 +326,105 @@ void registerWindow() {
     XPLMBringWindowToFront(window);
 }
 
+void menuAction(void* mRef, void* iRef) {
+    if (!strcmp((char *)iRef, "ActionAbout")) {
+        int winLeft, winTop, winRight, winBot;
+        XPLMGetScreenBoundsGlobal(&winLeft, &winTop, &winRight, &winBot);
+        XPLMCreateWindow_t params;
+        float screenWidth = fabs(winLeft - winRight);
+        float screenHeight = fabs(winTop - winBot);
+        float width = 450.0f;
+        float height = 180.0f;
+
+        // Calculate centered position for the window
+        params.structSize = sizeof(params);
+        params.left = (int)(winLeft + (screenWidth - width) / 2);
+        params.right = params.left + width;
+        params.top = (int)(winTop - (screenHeight - height) / 2);
+        params.bottom = params.top - height;
+        params.visible = 1;
+        params.refcon = nullptr;
+        params.drawWindowFunc = [](XPLMWindowID inWindowID, void *drawingRef){
+            XPLMSetGraphicsState(
+                                 0, // No fog, equivalent to glDisable(GL_FOG);
+                                 0, // One texture, equivalent to glEnable(GL_TEXTURE_2D);
+                                 0, // No lighting, equivalent to glDisable(GL_LIGHT0);
+                                 0, // No alpha testing, e.g glDisable(GL_ALPHA_TEST);
+                                 1, // Use alpha blending, e.g. glEnable(GL_BLEND);
+                                 0, // No depth read, e.g. glDisable(GL_DEPTH_TEST);
+                                 0 // No depth write, e.g. glDepthMask(GL_FALSE);
+            );
+            glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+            
+            int left, top, right, bottom;
+            XPLMGetWindowGeometry(inWindowID, &left, &top, &right, &bottom);
+            float color[] = {1.0f, 1.0f, 1.0f};
+            
+            float x = left + 16.0f;
+            float y = top - 16.0f;
+            XPLMDrawString(color, x, y, FRIENDLY_NAME, nullptr, xplmFont_Proportional);
+            y -= 16.0f;
+            XPLMDrawString(color, x, y, "Version " VERSION, nullptr, xplmFont_Proportional);
+            y -= 32.0f;
+            XPLMDrawString(color, x, y, "This software is licensed under the GNU General Public License, GPL-3.0", nullptr, xplmFont_Proportional);
+            y -= 32.0f;
+            XPLMDrawString(color, x, y, "For updates to " FRIENDLY_NAME ", please see the forums at x-plane.org", nullptr, xplmFont_Proportional);
+            y -= 16.0f;
+            XPLMDrawString(color, x, y, "or checkout the GitHub releases at github.com/rswilem/avitab-browser.", nullptr, xplmFont_Proportional);
+            y -= 16.0f;
+            XPLMDrawString(color, x, y, "Made with love by TheRamon, thank you for using this software!", nullptr, xplmFont_Proportional);
+        };
+        params.handleMouseClickFunc = nullptr;
+        params.handleRightClickFunc = nullptr;
+        params.handleMouseWheelFunc = nullptr;
+        params.handleKeyFunc = nullptr;
+        params.handleCursorFunc = nullptr;
+        params.layer = xplm_WindowLayerFloatingWindows;
+        params.decorateAsFloatingWindow = xplm_WindowDecorationRoundRectangle;
+        XPLMWindowID aboutWindow = XPLMCreateWindowEx(&params);
+        XPLMSetWindowTitle(aboutWindow, FRIENDLY_NAME);
+        XPLMSetWindowPositioningMode(aboutWindow, xplm_WindowPositionFree, -1);
+        XPLMBringWindowToFront(aboutWindow);
+    }
+    else if (!strcmp((char *)iRef, "ActionReloadConfig")) {
+        AppState::getInstance()->loadConfig();
+        
+        if (window) {
+            XPLMBringWindowToFront(window);
+        }
+    }
+    else if (!strcmp((char *)iRef, "ActionStandalone")) {
+        int winLeft, winTop, winRight, winBot;
+        XPLMGetScreenBoundsGlobal(&winLeft, &winTop, &winRight, &winBot);
+        XPLMCreateWindow_t params;
+        float screenWidth = fabs(winLeft - winRight);
+        float screenHeight = fabs(winTop - winBot);
+        float width = 800.0f;
+        float height = 600.0f;
+        
+        AppState::getInstance()->showBrowser();
+
+        // Calculate centered position for the window
+        params.structSize = sizeof(params);
+        params.left = (int)(winLeft + (screenWidth - width) / 2);
+        params.right = params.left + width;
+        params.top = (int)(winTop - (screenHeight - height) / 2);
+        params.bottom = params.top - height;
+        params.visible = 1;
+        params.refcon = nullptr;
+        params.drawWindowFunc = [](XPLMWindowID inWindowID, void *drawingRef){
+            AppState::getInstance()->draw(inWindowID);
+        };
+        params.handleMouseClickFunc = mouseClicked;
+        params.handleRightClickFunc = nullptr;
+        params.handleMouseWheelFunc = mouseWheel;
+        params.handleKeyFunc = keyPressed;
+        params.handleCursorFunc = mouseCursor;
+        params.layer = xplm_WindowLayerFloatingWindows;
+        params.decorateAsFloatingWindow = xplm_WindowDecorationRoundRectangle;
+        XPLMWindowID standaloneWindow = XPLMCreateWindowEx(&params);
+        XPLMSetWindowTitle(standaloneWindow, "Standalone");
+        XPLMSetWindowPositioningMode(standaloneWindow, xplm_WindowPositionFree, -1);
+        XPLMBringWindowToFront(standaloneWindow);
+    }
+}
