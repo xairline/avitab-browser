@@ -69,6 +69,7 @@ public:
     bool pluginInitialized = false;
     bool hasPower = false;
     bool browserVisible = false;
+    bool hasAvitab = false;
     Statusbar *statusbar;
     Browser *browser;
     CursorType activeCursor;

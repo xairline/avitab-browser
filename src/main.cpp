@@ -128,7 +128,7 @@ PLUGIN_API void XPluginReceiveMessage(XPLMPluginID from, long msg, void* params)
                 return;
             }
 
-            if (AppState::getInstance()->initialize()) {                
+            if (AppState::getInstance()->initialize() && AppState::getInstance()->hasAvitab) {
                 registerWindow();
             }
             break;
@@ -401,6 +401,11 @@ void menuAction(void* mRef, void* iRef) {
         float screenHeight = fabs(winTop - winBot);
         float width = 800.0f;
         float height = 600.0f;
+        
+        if (AppState::getInstance()->hasAvitab) {
+            width = AppState::getInstance()->tabletDimensions.browserWidth;
+            height = AppState::getInstance()->tabletDimensions.browserHeight;
+        }
         
         AppState::getInstance()->showBrowser();
 
