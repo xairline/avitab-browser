@@ -166,8 +166,15 @@ void AppState::update() {
         
     }
     else {
-        hasPower = Dataref::getInstance()->getCached<int>("avitab/panel_powered");
-        canBrowserVisible = hasPower && Dataref::getInstance()->getCached<int>("avitab/is_in_menu") == 0;
+        if (AppState::getInstance()->hasAvitab) {
+            hasPower = Dataref::getInstance()->getCached<int>("avitab/panel_powered");
+            canBrowserVisible = hasPower && Dataref::getInstance()->getCached<int>("avitab/is_in_menu") == 0;
+        } else {
+            // always allow browers in standalone mode
+            hasPower = true;
+            canBrowserVisible = true;
+        }
+        
         mainMenuButton->opacity = AppState::getInstance()->hasPower && Dataref::getInstance()->getCached<int>("avitab/is_in_menu") ? Dataref::getInstance()->getCached<float>("avitab/brightness") : 0.0f;
     }
     
@@ -178,7 +185,7 @@ void AppState::update() {
     else if (shouldBrowserVisible && canBrowserVisible) {
         browser->visibilityWillChange(true);
         browserVisible = true;
-        shouldBrowserVisible = false;
+        shouldBrowserVisible = AppState::getInstance()->hasAvitab ? false : true;
         checkLatestVersion();
     }
 
@@ -230,7 +237,9 @@ bool AppState::updateButtons(float normalizedX, float normalizedY, ButtonState s
 }
 
 void AppState::registerButton(Button *button) {
-    buttons.push_back(button);
+    if (hasAvitab) {
+        buttons.push_back(button);
+    }
 }
 
 void AppState::unregisterButton(Button *button) {
@@ -253,8 +262,8 @@ void AppState::showBrowser(std::string url) {
         else {
             Dataref::getInstance()->executeCommand("AviTab/app_about");
         }
-        shouldBrowserVisible = true;
     }
+    shouldBrowserVisible = true;
     
     if (!url.empty()) {
         browser->loadUrl(url);
@@ -360,6 +369,13 @@ url_5=
     }
     
     hasAvitab = loadAvitabConfig();
+    
+    if (!hasAvitab) {
+        tabletDimensions.textureWidth = STANDALONE_BROWSER_WIDTH;
+        tabletDimensions.textureHeight = STANDALONE_BROWSER_HEIGHT;
+        tabletDimensions.browserWidth = STANDALONE_BROWSER_WIDTH;
+        tabletDimensions.browserHeight = STANDALONE_BROWSER_HEIGHT;
+    }
     
     if (isReloading) {
         debug("Config file has been reloaded.\n");

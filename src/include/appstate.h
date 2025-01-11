@@ -70,6 +70,7 @@ public:
     bool hasPower = false;
     bool browserVisible = false;
     bool hasAvitab = false;
+    XPLMWindowID standaloneWindow;
     Statusbar *statusbar;
     Browser *browser;
     CursorType activeCursor;

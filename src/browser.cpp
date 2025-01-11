@@ -65,7 +65,7 @@ void Browser::initialize() {
             }
         });
     }
-    else {
+    else if (AppState::getInstance()->hasAvitab) {
         offsetStart = 0;
         offsetEnd = 0.935f;
         
@@ -230,25 +230,17 @@ void Browser::draw(XPLMWindowID windowId) {
         int x2 = x1 + width;
         int y2 = y1 + height;
         
-        float u = (float)width / tabletDimensions.textureWidth;
-        float v = (float)height / tabletDimensions.textureHeight;
+        float textureWidth = AppState::getInstance()->hasAvitab ? tabletDimensions.textureWidth : STANDALONE_BROWSER_WIDTH;
+        float textureHeight = AppState::getInstance()->hasAvitab ? tabletDimensions.textureHeight : STANDALONE_BROWSER_HEIGHT;
         
-//        glMatrixMode(GL_PROJECTION);
-//        glPushMatrix();
-//        glLoadIdentity();
-//        glOrtho(left, right, bottom, top, -1, 1);
-//
-//        glMatrixMode(GL_MODELVIEW);
-//        glPushMatrix();
-//        glLoadIdentity();
+        float u = (float)width / textureWidth;
+        float v = (float)height / textureHeight;
         
-//        glEnable(GL_TEXTURE_2D);
         
         glBegin(GL_QUADS);
-        float brightness = Dataref::getInstance()->getCached<float>("avitab/brightness");
+        float brightness = 1.0f;
         glColor4f(brightness, brightness, brightness, 1.0f);
-        
-        
+         
         glTexCoord2f(0, v);
         glVertex2f(x1,y1);
         glTexCoord2f(0, 0);
@@ -258,16 +250,8 @@ void Browser::draw(XPLMWindowID windowId) {
         glTexCoord2f(u, v);
         glVertex2f(x2,y1);
         glEnd();
-        
-//        glDisable(GL_TEXTURE_2D);
-        
-//        glMatrixMode(GL_MODELVIEW);
-//        glPopMatrix();
-//
-//        glMatrixMode(GL_PROJECTION);
-//        glPopMatrix();
+
     }
-    
     if (backButton) {
         backButton->draw();
     }
@@ -558,7 +542,13 @@ bool Browser::createBrowser() {
     debug("CEF instance for X-Plane 11 has been set up successfully.\n");
 #endif
     
-    handler = CefRefPtr<BrowserHandler>(new BrowserHandler(textureId, AppState::getInstance()->tabletDimensions.browserWidth, AppState::getInstance()->tabletDimensions.browserHeight));
+    handler = CefRefPtr<BrowserHandler>(
+                new BrowserHandler(
+                   textureId,
+                   AppState::getInstance()->hasAvitab ? AppState::getInstance()->tabletDimensions.browserWidth : STANDALONE_BROWSER_WIDTH,
+                   AppState::getInstance()->hasAvitab ? AppState::getInstance()->tabletDimensions.browserHeight : STANDALONE_BROWSER_HEIGHT
+               )
+    );
     
     CefWindowInfo window_info;
 #if LIN
@@ -610,6 +600,6 @@ CefMouseEvent Browser::getMouseEvent(float normalizedX, float normalizedY) {
 
     CefMouseEvent mouseEvent;
     mouseEvent.x = tabletDimensions.browserWidth * normalizedX;
-    mouseEvent.y = tabletDimensions.browserHeight * (1.0f - ((normalizedY - offsetStart) / (offsetEnd - offsetStart)));
+    mouseEvent.y = AppState::getInstance()->hasAvitab? tabletDimensions.browserHeight * (1.0f - ((normalizedY - offsetStart) / (offsetEnd - offsetStart))): tabletDimensions.browserHeight*normalizedY;
     return mouseEvent;
 }

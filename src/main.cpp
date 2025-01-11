@@ -177,7 +177,7 @@ int mouseClicked(XPLMWindowID inWindowID, int x, int y, XPLMMouseStatus status, 
     }
     
     float mouseX, mouseY;
-    if (!Dataref::getInstance()->getMouse(&mouseX, &mouseY, x, y)) {
+    if (!Dataref::getInstance()->getMouse(&mouseX, &mouseY, x, y, inWindowID)) {
         if (AppState::getInstance()->browserVisible && AppState::getInstance()->browser->hasInputFocus()) {
             AppState::getInstance()->browser->setFocus(false);
         }
@@ -213,7 +213,7 @@ int mouseWheel(XPLMWindowID inWindowID, int x, int y, int wheel, int clicks, voi
     }
     
     float mouseX, mouseY;
-    if (!Dataref::getInstance()->getMouse(&mouseX, &mouseY, x, y)) {
+    if (!Dataref::getInstance()->getMouse(&mouseX, &mouseY, x, y, inWindowID)) {
         return 0;
     }
     
@@ -229,7 +229,7 @@ int mouseCursor(XPLMWindowID inWindowID, int x, int y, void* inRefcon) {
     }
     
     float mouseX, mouseY;
-    if (!Dataref::getInstance()->getMouse(&mouseX, &mouseY, x, y)) {
+    if (!Dataref::getInstance()->getMouse(&mouseX, &mouseY, x, y, inWindowID)) {
         AppState::getInstance()->activeCursor = CursorDefault;
         return xplm_CursorDefault;
     }
@@ -259,6 +259,12 @@ float update(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoo
      if (!AppState::getInstance()->pluginInitialized) {
          return REFRESH_INTERVAL_SECONDS_SLOW;
      }
+    
+    if (window != AppState::getInstance()->standaloneWindow && !AppState::getInstance()->hasAvitab) {
+        // since we only have standalone window
+        // we need to use it as "windows"
+        window = AppState::getInstance()->standaloneWindow;
+    }
     
      Dataref::getInstance()->update();
      AppState::getInstance()->update();
@@ -296,6 +302,10 @@ float update(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoo
 }
 
 int draw(XPLMDrawingPhase inPhase, int inIsBefore, void * inRefcon) {
+    if (!AppState::getInstance()->hasAvitab) {
+        return 0;
+    }
+    
     AppState::getInstance()->draw(nullptr);
     return 1;
 }
@@ -399,8 +409,8 @@ void menuAction(void* mRef, void* iRef) {
         XPLMCreateWindow_t params;
         float screenWidth = fabs(winLeft - winRight);
         float screenHeight = fabs(winTop - winBot);
-        float width = 800.0f;
-        float height = 600.0f;
+        float width = STANDALONE_BROWSER_WIDTH;
+        float height = STANDALONE_BROWSER_HEIGHT;
         
         if (AppState::getInstance()->hasAvitab) {
             width = AppState::getInstance()->tabletDimensions.browserWidth;
@@ -431,5 +441,6 @@ void menuAction(void* mRef, void* iRef) {
         XPLMSetWindowTitle(standaloneWindow, "Standalone");
         XPLMSetWindowPositioningMode(standaloneWindow, xplm_WindowPositionFree, -1);
         XPLMBringWindowToFront(standaloneWindow);
+        AppState::getInstance()->standaloneWindow = standaloneWindow;
     }
 }
